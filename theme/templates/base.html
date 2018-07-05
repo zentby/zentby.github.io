@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width" />
 
     <title>{% block title %}{{ SITENAME }}{%endblock%}</title>
-
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/normalize.css" />
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/foundation.min.css" />
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/style.css" />
@@ -91,7 +91,7 @@
         <h5 class="sidebar-title">Social</h5>
         <ul class="side-nav">
         {% for name, link in SOCIAL %}
-            <li><a href="{{ link }}">{{ name }}</a></li>
+            <li><a href="{{ link }}">{{ icon }} {{ '&nbsp;' + name }}</a></li>
         {% endfor %}
         </ul>
         {% endif %}

@@ -52,9 +52,9 @@ AUTHOR_FEED_RSS = None
 # LINKS = (('Github', 'http://github.com/zentby')
 
 # Social widget
-SOCIAL = (('linkedin', 'https://www.linkedin.com/in/zentby/'),
-          ('github', 'https://github.com/zentby'),
-          ('twitter', 'https://twitter.com/zentby'))
+SOCIAL = (('linkedin', 'https://www.linkedin.com/in/zentby/', '<i class="fab fa-linkedin"></i>'),
+          ('github', 'https://github.com/zentby', '<i class="fab fa-github"></i>'),
+          ('email', 'mailto:zentby@gmail.com', '<i class="far fa-envelope"></i>'))
 
 DEFAULT_PAGINATION = False
 
