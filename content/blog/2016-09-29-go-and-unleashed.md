@@ -1,6 +1,6 @@
 Title:  Golang and Unleashed
 Date:   2016-09-29 21:14:00 +1300
-Category: tech
+Category: Go
 Tags: code, golang
 Slug: golang-and-unleashed
 

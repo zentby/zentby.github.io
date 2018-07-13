@@ -1,6 +1,6 @@
 Title: Entity Object Tracking
 Date: 2018-04-04 21:09:00 +1200
-Category: tech
+Category: EntityFramework
 Tags: ef
 Slug: entity-object-tracking
 

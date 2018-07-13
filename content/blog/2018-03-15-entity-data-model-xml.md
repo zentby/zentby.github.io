@@ -1,6 +1,6 @@
 Title: Entity Data Model XML
 Date: 2018-03-15 22:00:00 +1300
-Category: tech
+Category: EntityFramework
 Tags: ef
 Slug: entity-data-model-xml
 

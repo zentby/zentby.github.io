@@ -1,6 +1,6 @@
 ﻿Title: Introduction to Entity Data Model
 Date: 2018-03-08 23:14:00 +1300
-Category: tech
+Category: EntityFramework
 Tags: ef
 Slug: introduction-to-entity-data-model
 

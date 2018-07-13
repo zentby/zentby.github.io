@@ -1,6 +1,6 @@
 Title: Entity Data Model Generation
 Date: 2018-04-18 23:10:00 +1200
-Category: tech
+Category: EntityFramework
 Tags: ef
 Slug: edm-generation
 

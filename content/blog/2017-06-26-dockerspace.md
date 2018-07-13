@@ -1,6 +1,6 @@
 Title:  Docker and dockerspace
 Date:   2017-06-26 21:14:00 +1200
-Category: blog
+Category: Blog
 Tags: docker
 Slug: docker-and-dockerspace
 

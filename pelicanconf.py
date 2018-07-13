@@ -5,13 +5,11 @@ from __future__ import unicode_literals
 AUTHOR = 'Yang'
 SITENAME = 'Yang Talks'
 SITETITLE = 'Yang Talks'
-SITEURL = 'https://en.yangtalks.com'
+SITEURL = ''
 MAIN_MENU = True
+RELATIVE_URLS = True
 
 THEME = "./theme"
-GOOGLE_ANALYTICS = 'UA-84962714-2'
-
-DISQUS_SITENAME = "yangtalks"
 SITEMAP = {
     'format': 'xml',
     'priorities': {

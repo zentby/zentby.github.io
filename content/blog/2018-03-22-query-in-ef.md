@@ -1,6 +1,6 @@
 Title: Query in Entity Framework
 Date: 2018-03-22 21:09:00 +1300
-Category: tech
+Category: EntityFramework
 Tags: ef
 Slug: query-in-ef
 
