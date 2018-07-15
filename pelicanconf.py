@@ -47,7 +47,7 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-# LINKS = (('Github', 'http://github.com/zentby')
+#LINKS = [('NZEOI', 'http://yangtalks.com/mini-eoi')]
 
 # Social widget
 SOCIAL = (('linkedin', 'https://www.linkedin.com/in/zentby/', '<i class="fab fa-linkedin"></i>'),
@@ -57,4 +57,5 @@ SOCIAL = (('linkedin', 'https://www.linkedin.com/in/zentby/', '<i class="fab fa-
 DEFAULT_PAGINATION = False
 
 # Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+RELATIVE_URLS = True
+SUMMARY_MAX_LENGTH = 40

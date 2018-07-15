@@ -60,7 +60,6 @@
         <h5 class="sidebar-title">Site</h5>
         <ul class="side-nav">
             <li><a href="{{ SITEURL }}/archives.html">Archives</a>
-            <li><a href="{{ SITEURL }}/tags.html">Tags</a>
             {% if FEED_RSS %}
             <li><a href="{{ FEED_DOMAIN }}/{{ FEED_ATOM }}" rel="alternate">Atom feed</a></li>
             {% endif %}
@@ -78,11 +77,21 @@
         </ul>
         {% endif %}
 
+        {% if tags %}		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            {% for tag, articles in tags|sort %}
+            {% set num = articles|count %}
+            <p><a href="{{ SITEURL }}/{{ tag.url }}">{{ tag }}<span> ({{ num }})</span></a></p>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
         {% if LINKS %}
         <h5 class="sidebar-title">Links</h5>
         <ul class="side-nav">
         {% for name, link in LINKS %}
-            <li><a href="{{ link }}">{{ name }}</a></li>
+            <li><a href="{{ link }}"><i class="far fa-check-square"></i>{{ '&nbsp;' + name }}</a></li>
         {% endfor %}
         </ul>
         {% endif %}

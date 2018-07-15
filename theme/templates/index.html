@@ -7,13 +7,9 @@
             <article>
                 <a href="{{ article.url }}"><h3 class="article-title">{{ article.title }}</h3></a>
                 {% include 'article_infos.html' %}{{ article.summary }}
-                {% include 'article_infos_bottom.html' %}
                 <div class="flex-container">
-                    <div style="align-self: flex-start">
-                        {% include 'comments.html' %}
-                    </div>
                     <div class="flex-right">
-                        <a class="button radius secondary small right" href="{{ article.url }}">Read More</a>
+                        <a style="margin-right: 15px;" href="{{ article.url }}">Read More <i class="fas fa-chevron-down"></i></a>
                     </div>
                 </div>
                 <hr  class="gradient"/>
