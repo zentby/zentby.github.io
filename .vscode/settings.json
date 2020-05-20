@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/Users/daniel/.virtualenvs/zentby.github.io-E-92Fsen/bin/python",
+    "python.pythonPath": "/usr/local/bin/python3",
     "python.linting.pylintEnabled": false,
     "python.formatting.provider": "yapf"
 }
