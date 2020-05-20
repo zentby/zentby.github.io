@@ -1,9 +1,7 @@
-name: Jekyll site CI
+name: Publish Blog Site
 
 on:
   push:
-    branches: [ blog ]
-  pull_request:
     branches: [ blog ]
 
 jobs:
