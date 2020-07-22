@@ -21,4 +21,4 @@ DELETE_OUTPUT_DIRECTORY = True
 # Following items are often useful when publishing
 
 DISQUS_SITENAME = "yangtalks"
-GOOGLE_ANALYTICS = "UA-84962714-1"
+GOOGLE_ANALYTICS = "UA-84962714-5"
