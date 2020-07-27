@@ -2246,6 +2246,10 @@ button, .button {
   .dropdown.button.secondary:before {
     border-color: #333333 transparent transparent transparent; }
 
+/* Image */
+img {
+  padding: 15px 15px 15px 0;
+}
 /* Image Thumbnails */
 .th {
   line-height: 0;
@@ -2799,12 +2803,12 @@ p {
 
 /* Default header styles */
 h1, h2, h3, h4, h5, h6 {
-  font-family: "Open Sans", "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+  font-family: "Google Sans",Roboto,Arial,Helvetica,sans-serif;
   font-weight: 300;
   font-style: normal;
   color: #222222;
   text-rendering: optimizeLegibility;
-  margin-top: 0.2rem;
+  margin-top: 1rem;
   margin-bottom: 0.5rem;
   line-height: 1.4; }
   h1 small, h2 small, h3 small, h4 small, h5 small, h6 small {
