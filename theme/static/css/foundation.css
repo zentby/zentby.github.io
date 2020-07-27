@@ -2685,7 +2685,11 @@ ul.pagination {
 
 /* Pagination centred wrapper */
 .pagination-centered {
-  text-align: center; }
+  text-align: center; 
+  display: flex;
+  justify-content: space-around;
+  align-items: baseline;
+}
   .pagination-centered ul.pagination li {
     float: none;
     display: inline-block; }
@@ -5177,3 +5181,12 @@ th.hide-for-touch {
 
 .touch th.show-for-touch {
   display: table-cell !important; }
+
+footer p {
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+footer .large-6 {
+  width: 100%;
+}

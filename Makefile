@@ -64,6 +64,9 @@ help:
 html:
 	$(PELICAN) $(INPUTDIR) -o $(OUTPUTDIR) -s $(CONFFILE) $(PELICANOPTS)
 
+css:
+	npx minify $(BASEDIR)/theme/static/css/foundation.css > $(BASEDIR)/theme/static/css/foundation.min.css
+
 clean:
 	[ ! -d $(OUTPUTDIR) ] || rm -rf $(OUTPUTDIR)
 
