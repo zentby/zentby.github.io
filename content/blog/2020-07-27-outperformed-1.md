@@ -15,8 +15,6 @@ On July 8, 2020, GitHub deposited 21 TB of data into the Archive, beneath 250 m 
 I couldn't imagine how would the future people think of our codes. If they were more intelligent than what we are, they probably will laugh at us and throw them away. On the other hand, if they are a new species from doomed world, they probably wouldn't understand what those magic characters mean. The only scenario that could these archive being used, probably is for the survived human beings from the doomed world, who can hugely accelerate their information rebuilding after they figure out how to build the set of infrastructures of a software and internet.
 
 
-
-
 ## Digest
 
 #### [You've only added two lines - why did that take two days!](https://www.mrlacey.com/2020/07/youve-only-added-two-lines-why-did-that.html)
