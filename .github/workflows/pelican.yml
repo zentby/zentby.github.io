@@ -16,3 +16,7 @@ jobs:
         GH_PAGES_BRANCH: master
         PELICAN_CONFIG_FILE: publishconf.py
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - uses: fjogeleit/http-request-action@master
+      with:
+        url: 'https://sc.ftqq.com/SCU36723T44a22603e6583fae26046e2fb9a9e5f45c004d0da25fd.send?text=博文已发布'
+        method: 'GET'
