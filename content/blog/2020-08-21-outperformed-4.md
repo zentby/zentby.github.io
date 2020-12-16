@@ -3,6 +3,7 @@ Date: 2020-08-21 05:30:00 +1200
 Category: Outperformed
 Tags: outperformed
 Slug: outperformed-4
+Status: hidden
 
 This is a weekly article, sharing what interested me in the most recently. 
 
