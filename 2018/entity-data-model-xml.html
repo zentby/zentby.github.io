@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Entity Data Model XML</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/entity-data-model-xml.html" rel="bookmark"
+        title="Permalink to Entity Data Model XML">Entity Data Model XML</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-03-15T22:00:00+13:00">Thu 15 March 2018
+</h6>
+
+
+    <p>Last time, we described how Entity Data Model(EDM) was designated to help DBA and developer to work with their own contexts. Today let’s dig deeper into EDM to see what it consists of and what it looks like in reality.</p>
+<h2>Core Concepts</h2>
+<p>The EDM uses three key concepts to describe the structure of data: <strong>entity type</strong>, <strong>association type</strong>, and <strong>property</strong>. These are the most important concepts in describing the structure of data in any implementation of the EDM.</p>
+<p><img alt="entity data model" src="https://i-msdn.sec.s-msft.com/dynimg/IC315129.gif"></p>
+<ol>
+<li>Entity Type</li>
+</ol>
+<p>In a conceptual model, entity types are constructed from properties and describe the structure of top-level concepts, such as a customers and orders in a business application. It is not necessarily A table in database, it is meant to face the application.
+<em>Inheritance is supported with entity types.</em></p>
+<ol>
+<li>Property</li>
+</ol>
+<p>Like an object in a programming language, entity types contain properties that define the structure and characteristics. For example, a Customer entity type may have properties such as CustomerId, Name, and Address.
+<em>Normal properties can only contains primitive data(string/int/bit)</em></p>
+<ol>
+<li>Association Type</li>
+</ol>
+<p>An association represents a relationship between two entity types (such as Customer and Order). Every association has two ends that specify the entity types involved. An association end owns a multiplicity that can have a value of one (1), zero or one (0..1), or many (*). 
+<em>Entities at one end of an association can be accessed through navigation properties. We’ll talk navigation properties in later posts</em></p>
+<h2>Entity Data Model XML (EDMX)</h2>
+<p>Entity Data Model is a concept. The Entity Framework has a particular implementation that is realized as the EDMX file at design time. The EDMX file is a XML document under the cover and it is made of three layers. These three layers have nothing to do with EDM but an implementation within Entity Framework.</p>
+<p>The first one layer of the three represents the conceptual model, which is the actual EDM. The second one represents the database schema, and the third represents the mappings between the first two. Each of the layers will become a XML file at run time, ended with CSDL, SSDL and MDL respectively.</p>
+<p>If we open an EDMX file in XML editor, you’ll see these three parts in the file content.</p>
+<p><img alt="EDMX" src="https://en.yangtalks.com/2018/EDMX.png"></p>
+<p>The file composed of two main sections: the runtime information and the designer information. The three parts that we are going to talk about are all in the runtime section.</p>
+<h3>CSDL</h3>
+<p>The conceptual content includes everything needed in a EDM model, including entity type/property/association. Check out the file yourself:</p>
+<p><img alt="CSDL" src="https://en.yangtalks.com/2018/CSDL.png"></p>
+<p>The entity container have EntitySets and AssociationSets. Each child represents a Entity Type or Association Type. After the container it lists all the entity type with defined properties and property’s properties.</p>
+<h3>SSDL</h3>
+<p>The StorageModels section of an EDMX file is a schematic representation of its associated data store. The elements of this file are similar to those of the CSDL file. </p>
+<p><img alt="EDMX" src="https://en.yangtalks.com/2018/SSDL.png"></p>
+<p>For consistency, the tables and columns are called EntityType and Property. You will see these referred to in documentation as tables and columns, and even as such in the visual tools.  The difference is: the entity type names are the actual names of the tables in the database and the property types are the data store data types. </p>
+<h3>MDL</h3>
+<p>The Mapping section is quite straight forward that it contains the field mappings between conceptual model and store model. As we talked in <a href="https://en.yangtalks.com/2018/introduction-to-entity-data-model.html">last post</a>, one entity type in CSDL may relate to multiple tables from SSDL. In that case you would see multiple <em>MappingFragment</em> nodes under each entity set mapping.</p>
+<h2>Summary</h2>
+<p>So far we have had a general view of what entity data model consists of in real life and the inner structures in EDMX file. One practical benefit I had seen from these knowledge is that this give us a way to update the EDMX file without manually “Update Model from Database” from UI — which cost one hour to finish! 
+<em>(PS: A good news is in Entity Framework 6, the reload performance has been improved from 60 minutes to 30 seconds!)</em></p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/ef.html">ef </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/entity-data-model-xml.html";
+        var disqus_url = "https://en.yangtalks.com/2018/entity-data-model-xml.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

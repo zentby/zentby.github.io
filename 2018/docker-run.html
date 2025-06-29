@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Running App in Docker (1)</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/docker-run.html" rel="bookmark"
+        title="Permalink to Running App in Docker (1)">Running App in Docker (1)</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-09-08T19:30:00+12:00">Sat 08 September 2018
+</h6>
+
+
+    <h2>Docker Run</h2>
+<p>When you are likely to run a container on your own machine, you need two steps.</p>
+<ol>
+<li>Find the image repository and a proper tag.</li>
+<li>Use <code>docker run</code> to set container runtime parameters and then start.</li>
+</ol>
+<h3>Example</h3>
+<p>We'd like to run a RabbitMQ on your local machine. First, we choose an image from the <a href="https://hub.docker.com/_/rabbitmq/">official repository</a>. E.g. we choose <code>rabbitmq:management-alpine</code>. So we got the basic command:</p>
+<div class="highlight"><pre><span></span><code>$ docker run rabbitmq:management-alpine
+</code></pre></div>
+
+
+<p>To add port forwarding to the container, we need to specify the <code>-p</code> parameter:</p>
+<div class="highlight"><pre><span></span><code>$ docker run <span class="se">\</span>
+-p <span class="m">5672</span>:5672 <span class="se">\</span>
+-p <span class="m">15672</span>:15672 <span class="se">\</span>
+rabbitmq:management-alpine
+</code></pre></div>
+
+
+<p>It replace our host port <code>5672</code> and <code>15672</code> with the container's.</p>
+<p>After that, we'd like to give a reasonable name to the container and ask the container auto start after my docker daemon is restarted. So I need to add command <code>--name</code> and <code>--restart</code>:</p>
+<div class="highlight"><pre><span></span><code>$ docker run <span class="se">\</span>
+-p <span class="m">5672</span>:5672 <span class="se">\</span>
+-p <span class="m">15672</span>:15672 <span class="se">\</span>
+--name dev-rabbitmq <span class="se">\</span>
+--restart always <span class="se">\</span>
+-d <span class="se">\</span>
+rabbitmq:management-alpine
+</code></pre></div>
+
+
+<p>And don't forget the <code>-d</code> if you don't want to attach the container STDIN/STDOUT.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/container.html">Container</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/docker.html">docker </a>
+    <a href="https://en.yangtalks.com/tag/container.html">container </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/docker-run.html";
+        var disqus_url = "https://en.yangtalks.com/2018/docker-run.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>YangTalks - EntityFramework</title><link href="https://en.yangtalks.com/" rel="alternate"></link><link href="https://en.yangtalks.com/feeds/entityframework.atom.xml" rel="self"></link><id>https://en.yangtalks.com/</id><updated>2018-05-15T21:10:00+12:00</updated><entry><title>POCO and T4</title><link href="https://en.yangtalks.com/2018/poco-and-t4.html" rel="alternate"></link><published>2018-05-15T21:10:00+12:00</published><updated>2018-05-15T21:10:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-05-15:/2018/poco-and-t4.html</id><summary type="html">&lt;p&gt;It’s been a while not writing any post, I’ll try finish this series before I get tired of it. This time I’ll talk about two words - POCO and T4&lt;/p&gt;
+&lt;h2&gt;What is POCO?&lt;/h2&gt;
+&lt;p&gt;POCO is Plain Old CLR …&lt;/p&gt;</summary><content type="html">&lt;p&gt;It’s been a while not writing any post, I’ll try finish this series before I get tired of it. This time I’ll talk about two words - POCO and T4&lt;/p&gt;
+&lt;h2&gt;What is POCO?&lt;/h2&gt;
+&lt;p&gt;POCO is Plain Old CLR Object; a word from &lt;a href="https://en.wikipedia.org/wiki/Plain_old_Java_object"&gt;POJO&lt;/a&gt; - Plain Old Java Object - maybe, if for Lua it would be POLO, Golang is POGO, php is POPO, etc. &lt;/p&gt;
+&lt;p&gt;CLR is short for Common Language Runtime. It’s a very correct definition for POCO but to be easier, just use C# instead.&lt;/p&gt;
+&lt;p&gt;Plain Old - means simple, straight, no dependency whatsoever. &lt;/p&gt;
+&lt;p&gt;POCO class looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Product&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;Code&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="k"&gt;get&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And Non-POCO class:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="na"&gt;[EdmEntityTypeAttribute(Namespace=&amp;quot;CMSModel&amp;quot;, Name=&amp;quot;Product&amp;quot;)]&lt;/span&gt;
+&lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Product&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;EntityObject&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="na"&gt;    [EdmScalarPropertyAttribute(EntityKeyProperty=true)]&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;Code&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="k"&gt;get&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Why POCO is better than non-POCO?&lt;/h2&gt;
+&lt;p&gt;Think of you already created a non-POCO classes that inherited or attributed with heaps of classes from EF libraries. You put all of these classes into assembly A, and you have another business project B which is dependent on A. Because you need to write logics for these classes so you also referred EF libraries in project B.&lt;/p&gt;
+&lt;p&gt;Normally you don’t update EF references in A too often as it may introduce unnecessary issues. As projects increasing, the dependencies become very complicated. EF library upgrade involves more and more projects that dependent on A or B. &lt;/p&gt;
+&lt;p&gt;At this point, if you have a project C and somehow it depends on A or B (closely or far away). Somehow, project C happen needs another functionality in one of EF libraries; a higher version than the one referenced by project A. Then the conflicts come up.&lt;/p&gt;
+&lt;p&gt;Some time you can be aware of the conflicts and avoid them in advance. But some time you wouldn’t notice them until something is wrong.&lt;/p&gt;
+&lt;p&gt;But if you use POCO at the very beginning, you won’t have these trouble as you never reference EF libraries in A or B. &lt;/p&gt;
+&lt;h2&gt;What does POCO to do with Entity Framework?&lt;/h2&gt;
+&lt;p&gt;CSDL defines the conceptual models, but it’s not possible to code with the XML data.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="csdl" src="https://en.yangtalks.com/2018/CSDL.png"&gt;&lt;/p&gt;
+&lt;p&gt;To archive this, Visual Studio analyzes the CSDL data and automatically generate C# classes. (Microsoft used to love making things automatically. End-users love that but not the programmers, especially when they frequently get a blue image on their screen.) &lt;/p&gt;
+&lt;p&gt;The generated classes are non-POCO classes and it would introduce issues that we mentioned earlier.&lt;/p&gt;
+&lt;p&gt;With POCO classes, the models are more deliberate now. Any changes on framework or dependencies won’t effects the existing codes. &lt;/p&gt;
+&lt;p&gt;The whole process used to be &lt;code&gt;CSDL -&amp;gt; Auto Generating -&amp;gt; Generated Classes&lt;/code&gt; . EF takes CSDL as input and domain classes as output.&lt;/p&gt;
+&lt;p&gt;Now the process is &lt;code&gt;CSDL -&amp;gt; POCO Classes -&amp;gt; Auto Mapping&lt;/code&gt;. Both CSDL and POCO classes become input and EF will get them mapped at runtime.&lt;/p&gt;
+&lt;p&gt;The removed &lt;code&gt;Auto Generating&lt;/code&gt; later became the new Code Generation tool — T4 Template.&lt;/p&gt;
+&lt;h2&gt;What is T4 Template?&lt;/h2&gt;
+&lt;p&gt;T4 is short for Text Template Transformation Toolkit. It’s a template processor, similar to Razor in ASP.NET. Normal template processor render for html, and T4 also supports rendering code from code. &lt;/p&gt;
+&lt;p&gt;It’s like writing code to let it auto write code. Unfortunately, it is not as fancy as it sounds like. Sometimes it introduces more troubles than what it might have saved.&lt;/p&gt;
+&lt;p&gt;There are two signs to tell if use T4 or not. First, do you need to write similar code for a large amount of sources? Second, will you modify the generated code frequently(can it be overwritten safely)? Both of them are what POCO meets.&lt;/p&gt;
+&lt;p&gt;Here’s an example of T4 template:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;template&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;false&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;hostspecific&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;true&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;language&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;C#&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;assembly&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Core&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Linq&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Text&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.IO&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Collections.Generic&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;output&lt;/span&gt; &lt;span class="n"&gt;extension&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;.cs&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;namespace&lt;/span&gt; &lt;span class="nn"&gt;T4Testing&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;
+&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;ttFilePath&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Host&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ResolvePath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ReadLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttFilePath&lt;/span&gt; &lt;span class="p"&gt;+&lt;/span&gt; &lt;span class="s"&gt;@&amp;quot;\data.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;partial&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; 
+    &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Something&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It reads lines from &lt;code&gt;data.txt&lt;/code&gt; file and generate &lt;code&gt;partial&lt;/code&gt; classes for each line.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;data.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="err"&gt;    Pyramid&lt;/span&gt;
+&lt;span class="err"&gt;    Cube&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;code.cs&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;namespace&lt;/span&gt; &lt;span class="nn"&gt;T4Testing&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;partial&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Pyramid&lt;/span&gt; 
+    &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Something&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;   
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;partial&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Cube&lt;/span&gt; 
+    &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Something&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;   
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Frankly speaking (typing), writing a T4 template to generate code is more interesting than what it is generating.&lt;/strong&gt; For modern IDEs like Visual Studio, with or without ReSharper, it always provides a deadly easy way to guess what you are trying to code. T4 is useful only if you need to type a large number of similar code. Even in that case, it is more likely a one-off thing that you can throw it away as soon as it has created the classes. Because the more important and difficult part for each class is business logic.&lt;/p&gt;
+&lt;p&gt;Some would say that logic can also be defined in structured format like XML. It’s doable but if so you’ll need to write code to parse and convert them from XML to your T4 code. The effort and complexity is not reduced by doing so and it will even create a lot of new troubles.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Entity Data Model Generation</title><link href="https://en.yangtalks.com/2018/edm-generation.html" rel="alternate"></link><published>2018-04-18T23:10:00+12:00</published><updated>2018-04-18T23:10:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-04-18:/2018/edm-generation.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Database/Model First&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's get one step back and have a quick look at how the conceptual models had been built at the beginning.&lt;/p&gt;
+&lt;p&gt;Before we build the database and the program, there's an equal chance for either having database …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Database/Model First&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's get one step back and have a quick look at how the conceptual models had been built at the beginning.&lt;/p&gt;
+&lt;p&gt;Before we build the database and the program, there's an equal chance for either having database design first or having domain model design first. Initially Visual Studio supports both ways to create the Entity Data Model, one of which called &lt;strong&gt;Database First&lt;/strong&gt; and the other called &lt;strong&gt;Model First&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;Database First&lt;/strong&gt; utilizes reverse engining to generate the EMD from an existing database. &lt;strong&gt;Model First&lt;/strong&gt; is the other way around that the database is created/updated after EDM is finished in the designer.&lt;/p&gt;
+&lt;p&gt;With &lt;strong&gt;Database First&lt;/strong&gt;, the update direction will always be from database to models. Every changes on databases can be updated to models by redo the operation. On the other hand, in &lt;strong&gt;Model First&lt;/strong&gt; any changes to the database may be before you applied them to models. However, Model First allows developers to design the app without concerning too much on database structure, which can help build the prototype quickly.&lt;/p&gt;
+&lt;p&gt;These days, the border between these two ways has been becoming more blurrier. They all eventually build up with the EDMX file and can be maintained from the “designer”— either use command &lt;code&gt;Update Model from Database&lt;/code&gt; to update the EDM, or &lt;code&gt;Generate Database from Model&lt;/code&gt; to create sql scripts re-generating the whole database.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Operation in Visual Studio EDMX Designer" src="https://en.yangtalks.com/2018/EDM-designer.png"&gt;
+*Operation in Visual Studio EDMX Designer&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Code First&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;Code First&lt;/strong&gt; was a “new” concept since EF 4.1 but it didn’t get much promotion until EF 6. A lot of  improvements were made in EF 6 including Fluent API (&lt;em&gt;to configure EDM mappings by codes&lt;/em&gt;) and migration tools(&lt;em&gt;to manage database changes&lt;/em&gt;). Hardcore programmers finally got rid of the designer when deal with databases. At the version of EF 6.1, it introduced the ability to generate&lt;strong&gt;Code First&lt;/strong&gt; model from database — it helps existing app get transfered to &lt;strong&gt;Code First&lt;/strong&gt; if the team wants. &lt;/p&gt;
+&lt;p&gt;In EF Core (or EF7), the &lt;strong&gt;Code First&lt;/strong&gt; will be the only way to create EDM.( We can tell how much MS is willing to retire the visual designer. The key feature to support “code first” is &lt;strong&gt;migration&lt;/strong&gt;, it allows developers update both the classes and database at the same time without losing any data. The migration also makes it possible to upgrade the db at any point to the latest version. The developers will not need to maintain the DB upgrade manually anymore.&lt;/p&gt;
+&lt;p&gt;I am in favor of the &lt;strong&gt;Code First&lt;/strong&gt; as I really love the idea that maintaining the database via codes. It means by tracking the code changes you’ll be able to have the view of the actually history of the realistic entity.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Choose how to create EDM" src="https://en.yangtalks.com/2018/modeling-work-flow-options.png"&gt;
+*Choose how to create EDM&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Entity Object Tracking</title><link href="https://en.yangtalks.com/2018/entity-object-tracking.html" rel="alternate"></link><published>2018-04-04T21:09:00+12:00</published><updated>2018-04-04T21:09:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-04-04:/2018/entity-object-tracking.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Object State&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Last time we introduced how to query database from conceptual models. It includes LINQ to Entities and Entity SQL. With &lt;code&gt;IQueryable&lt;/code&gt; object, the sql script will be built and executed automatically within the method &lt;code&gt;.ToList()&lt;/code&gt;. After the data …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Object State&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Last time we introduced how to query database from conceptual models. It includes LINQ to Entities and Entity SQL. With &lt;code&gt;IQueryable&lt;/code&gt; object, the sql script will be built and executed automatically within the method &lt;code&gt;.ToList()&lt;/code&gt;. After the data is loaded in our program, we'll operate against them and save changes back to the database. Today we'll talk about how Entity Framework manage the changes in our program.&lt;/p&gt;
+&lt;p&gt;When the query executes through &lt;code&gt;ObjectContext&lt;/code&gt; and is materialized into objects, Entity Framework takes a snapshot of an entity’s values. The context stores two set of values of the entity. One of them is the original values of the object and it remains static. The other one will be a realtime values that being modified in the program. The object that saved the two set of values is named &lt;code&gt;ObjectStateEntry&lt;/code&gt;. Every object returned from database will have an instance of &lt;code&gt;ObjectStateEntry&lt;/code&gt; as a shadow.&lt;/p&gt;
+&lt;p&gt;Each &lt;code&gt;ObjectStateEntry&lt;/code&gt; has a property &lt;code&gt;State&lt;/code&gt; to reflect the state of the entity(&lt;code&gt;Unchanged&lt;/code&gt;, &lt;code&gt;Modified&lt;/code&gt;, &lt;code&gt;Added&lt;/code&gt; or &lt;code&gt;Deleted&lt;/code&gt;). As the user modifies the objects, the &lt;code&gt;ObjectContext&lt;/code&gt; updates  the  current  values  of  the  related  &lt;code&gt;ObjectStateEntry&lt;/code&gt;  as  well  as  its &lt;code&gt;State&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The entity object  itself  also has an &lt;code&gt;EntityState&lt;/code&gt; property, which it inherits from &lt;code&gt;EntityObject&lt;/code&gt;. As long as the object is being managed by the context, its &lt;code&gt;EntityState&lt;/code&gt; will always match the &lt;code&gt;State&lt;/code&gt; of the &lt;code&gt;ObjectStateEntry&lt;/code&gt;. If the object is not being managed by the context, there is no &lt;code&gt;ObjectStateEntry&lt;/code&gt; and the entity’s &lt;code&gt;State&lt;/code&gt; is &lt;code&gt;Detached&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Save Changes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;After finish modifying conceptual objects that loaded from context, we could easily get these changes applied to database by call the method of &lt;code&gt;SaveChanges&lt;/code&gt; against the context. And by doing that all the SQL scripts will be automatically generated and executed.&lt;/p&gt;
+&lt;p&gt;When the context was notified of a property change, not only did it modify the current value in the &lt;code&gt;ObjectStateEntry&lt;/code&gt;, but it also set another tracking value that indicates that the property was changed. During &lt;code&gt;SaveChanges&lt;/code&gt;, the context then looks for those tracking values to determine which fields were changed.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;customer&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;FirstOrDefault&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt; &lt;span class="p"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Jason&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;customer&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;IsObsolete&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SaveChanges&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;WIth SQL Profiler, we'll get the executing sql:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;exec&lt;/span&gt; &lt;span class="n"&gt;sp_executesql&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;dbo&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;set&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;IsObsolete&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;@0&lt;/span&gt;
+&lt;span class="n"&gt;where&lt;/span&gt; &lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;@1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="mi"&gt;@0&lt;/span&gt; &lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;@1&lt;/span&gt; &lt;span class="n"&gt;nvarchar&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;@0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;@1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;Jason&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;No Tracking&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;No tracking query, as the name suggest, means the objects that returned by the query would not be managed by the context. Though it relates to what is called &lt;code&gt;MergeOption&lt;/code&gt; for querying, which controls how to deal with result with existing cached objects in context (queried in the same transaction).&lt;/p&gt;
+&lt;p&gt;When querying with &lt;code&gt;NoTracking&lt;/code&gt; option, it does not only means the &lt;code&gt;SaveChanges&lt;/code&gt; will not save any changes on those objects, but also means all the &lt;code&gt;ObjectStateEntry&lt;/code&gt; objects creation will be skipped by Entity Framework. Based on these two features, &lt;code&gt;NoTracking&lt;/code&gt; is often used for readonly data querying and it improves the performance significantly for large volume of data.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Query in Entity Framework</title><link href="https://en.yangtalks.com/2018/query-in-ef.html" rel="alternate"></link><published>2018-03-22T21:09:00+13:00</published><updated>2018-03-22T21:09:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-03-22:/2018/query-in-ef.html</id><summary type="html">&lt;p&gt;With Entity Data Model, we built the connection between conceptual models and database schema. The next question would be how we’re going to code with the EDM objects.&lt;/p&gt;
+&lt;p&gt;Today we’ll have a quick view to LINQ to Entities …&lt;/p&gt;</summary><content type="html">&lt;p&gt;With Entity Data Model, we built the connection between conceptual models and database schema. The next question would be how we’re going to code with the EDM objects.&lt;/p&gt;
+&lt;p&gt;Today we’ll have a quick view to LINQ to Entities, which is the main way developing with conceptual models, as well as Entity SQL —a storage independent query language. Either way the queries would eventually be transformed to corresponding sql query to database.&lt;/p&gt;
+&lt;h3&gt;LINQ to Entities&lt;/h3&gt;
+&lt;p&gt;LINQ is an acronym stands for &lt;a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/"&gt;Language-INtegrated Query&lt;/a&gt;. It is a set of query technologies that allow you to create an unified query against different data sources. So on language level, it represents a bunch of methods to operate object sets. &lt;/p&gt;
+&lt;p&gt;When LINQ applied with Entity Framework, we got three different technologies: &lt;a href="https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/linq-and-ado-net"&gt;LINQ to DateSet, LINQ to SQL and LINQ to Entities&lt;/a&gt;. This time we'll talk about LINQ to Entities only.&lt;/p&gt;
+&lt;p&gt;LINQ to Entities supports both query syntax and method syntax of LINQ. Query syntax is similar to SQL query, writing with c#, you can compose you LINQ inline by using &lt;em&gt;from/where/select&lt;/em&gt; keywords:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;customers&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;from&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;DbContext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Set&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;()&lt;/span&gt;
+                            &lt;span class="k"&gt;where&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Deleted&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;
+                            &lt;span class="k"&gt;select&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;blockquote&gt;
+&lt;p&gt;The reason why LINQ query starts with &lt;code&gt;from&lt;/code&gt; instead of &lt;code&gt;select&lt;/code&gt;, it must be for enabling IntelliSense while editing. It's happening all the time in Sql Server Management Tool that column names only get populated after you typed table name -- which always be the second line of your script.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;WIth method syntax, on the other hand, the code can be more straight forward:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;customers&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;DbContext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Set&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;()&lt;/span&gt;
+                &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Deleted&lt;/span&gt; &lt;span class="p"&gt;==&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Both methods result to a same data set in &lt;code&gt;customers&lt;/code&gt; variable and both the types of the variables would  be &lt;code&gt;IQueryable&lt;/code&gt;. Everyone new to LINQ to Entities must be careful with the differences between &lt;code&gt;IQueryable&lt;/code&gt; and &lt;code&gt;IEnumerable&lt;/code&gt;. The &lt;code&gt;IQueryable&lt;/code&gt; contains metadata about the query, such as the query expression and the provider being used, and it only has result returned within the object after the query inside is executed. The easiest way to execute the query and convert a &lt;code&gt;IQueryable&lt;/code&gt; to a &lt;code&gt;IEnumerable&lt;/code&gt; is call &lt;code&gt;.ToList()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;customers&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ToList&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;blockquote&gt;
+&lt;p&gt;Under the cover, &lt;code&gt;IQueryable&lt;/code&gt; is building an expression tree when you fill your chaining methods. The execution of the &lt;code&gt;IQueryable&lt;/code&gt; varies based on different data provider. It converts the expression tree into format the provider recongnized and send it to the corresponding server. Potentially it could support all data sources, as long as there is an implementation of &lt;code&gt;IQueryable&lt;/code&gt; from those providers.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The expression above  would be executed on our DB server  and return the result into a &lt;code&gt;List&amp;lt;T&amp;gt;&lt;/code&gt; object. This query can be easily monitored with &lt;a href="https://docs.microsoft.com/en-us/sql/tools/sql-server-profiler/sql-server-profiler"&gt;SQL Server Profiler&lt;/a&gt; if you're using MS SQL Server. It would look like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extent1&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;dbo&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extent1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extent1&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Deleted&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It's fairly a simple SQL query that generated from our code but sometimes the queries may look more complex. We might come back and talk to its impact on performance later.&lt;/p&gt;
+&lt;h3&gt;Entity SQL&lt;/h3&gt;
+&lt;p&gt;What is Entity SQL? &lt;/p&gt;
+&lt;p&gt;Well, Entity SQL is another query language Microsoft invented .... to consume your enthusiasms on SQL-like languages. &lt;/p&gt;
+&lt;p&gt;Here's the way using Entity SQL to implement our query to get customers id:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;EntityCommand&lt;/span&gt; &lt;span class="n"&gt;cmd&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CreateCommand&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CommandText&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s"&gt;@&amp;quot;SELECT VALUE c.Id FROM Customers AS c WHERE c.Deleted = 0&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;EntityDataReader&lt;/span&gt; &lt;span class="n"&gt;reader&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ExecuteReader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;CommandBehavior&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SequentialAccess&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;// Extract data from reader&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;In this post we talked about approaches to query database with Entity Framework. There is no doubt that my favorite one is to use LINQ chaining methods. It helps you validate in compile time so you can always focus on the business logics.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Entity Data Model XML</title><link href="https://en.yangtalks.com/2018/entity-data-model-xml.html" rel="alternate"></link><published>2018-03-15T22:00:00+13:00</published><updated>2018-03-15T22:00:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-03-15:/2018/entity-data-model-xml.html</id><summary type="html">&lt;p&gt;Last time, we described how Entity Data Model(EDM) was designated to help DBA and developer to work with their own contexts. Today let’s dig deeper into EDM to see what it consists of and what it looks like …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Last time, we described how Entity Data Model(EDM) was designated to help DBA and developer to work with their own contexts. Today let’s dig deeper into EDM to see what it consists of and what it looks like in reality.&lt;/p&gt;
+&lt;h2&gt;Core Concepts&lt;/h2&gt;
+&lt;p&gt;The EDM uses three key concepts to describe the structure of data: &lt;strong&gt;entity type&lt;/strong&gt;, &lt;strong&gt;association type&lt;/strong&gt;, and &lt;strong&gt;property&lt;/strong&gt;. These are the most important concepts in describing the structure of data in any implementation of the EDM.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="entity data model" src="https://i-msdn.sec.s-msft.com/dynimg/IC315129.gif"&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Entity Type&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In a conceptual model, entity types are constructed from properties and describe the structure of top-level concepts, such as a customers and orders in a business application. It is not necessarily A table in database, it is meant to face the application.
+&lt;em&gt;Inheritance is supported with entity types.&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Property&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Like an object in a programming language, entity types contain properties that define the structure and characteristics. For example, a Customer entity type may have properties such as CustomerId, Name, and Address.
+&lt;em&gt;Normal properties can only contains primitive data(string/int/bit)&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Association Type&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;An association represents a relationship between two entity types (such as Customer and Order). Every association has two ends that specify the entity types involved. An association end owns a multiplicity that can have a value of one (1), zero or one (0..1), or many (*). 
+&lt;em&gt;Entities at one end of an association can be accessed through navigation properties. We’ll talk navigation properties in later posts&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Entity Data Model XML (EDMX)&lt;/h2&gt;
+&lt;p&gt;Entity Data Model is a concept. The Entity Framework has a particular implementation that is realized as the EDMX file at design time. The EDMX file is a XML document under the cover and it is made of three layers. These three layers have nothing to do with EDM but an implementation within Entity Framework.&lt;/p&gt;
+&lt;p&gt;The first one layer of the three represents the conceptual model, which is the actual EDM. The second one represents the database schema, and the third represents the mappings between the first two. Each of the layers will become a XML file at run time, ended with CSDL, SSDL and MDL respectively.&lt;/p&gt;
+&lt;p&gt;If we open an EDMX file in XML editor, you’ll see these three parts in the file content.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="EDMX" src="https://en.yangtalks.com/2018/EDMX.png"&gt;&lt;/p&gt;
+&lt;p&gt;The file composed of two main sections: the runtime information and the designer information. The three parts that we are going to talk about are all in the runtime section.&lt;/p&gt;
+&lt;h3&gt;CSDL&lt;/h3&gt;
+&lt;p&gt;The conceptual content includes everything needed in a EDM model, including entity type/property/association. Check out the file yourself:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="CSDL" src="https://en.yangtalks.com/2018/CSDL.png"&gt;&lt;/p&gt;
+&lt;p&gt;The entity container have EntitySets and AssociationSets. Each child represents a Entity Type or Association Type. After the container it lists all the entity type with defined properties and property’s properties.&lt;/p&gt;
+&lt;h3&gt;SSDL&lt;/h3&gt;
+&lt;p&gt;The StorageModels section of an EDMX file is a schematic representation of its associated data store. The elements of this file are similar to those of the CSDL file. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="EDMX" src="https://en.yangtalks.com/2018/SSDL.png"&gt;&lt;/p&gt;
+&lt;p&gt;For consistency, the tables and columns are called EntityType and Property. You will see these referred to in documentation as tables and columns, and even as such in the visual tools.  The difference is: the entity type names are the actual names of the tables in the database and the property types are the data store data types. &lt;/p&gt;
+&lt;h3&gt;MDL&lt;/h3&gt;
+&lt;p&gt;The Mapping section is quite straight forward that it contains the field mappings between conceptual model and store model. As we talked in &lt;a href="https://en.yangtalks.com/2018/introduction-to-entity-data-model.html"&gt;last post&lt;/a&gt;, one entity type in CSDL may relate to multiple tables from SSDL. In that case you would see multiple &lt;em&gt;MappingFragment&lt;/em&gt; nodes under each entity set mapping.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;So far we have had a general view of what entity data model consists of in real life and the inner structures in EDMX file. One practical benefit I had seen from these knowledge is that this give us a way to update the EDMX file without manually “Update Model from Database” from UI — which cost one hour to finish! 
+&lt;em&gt;(PS: A good news is in Entity Framework 6, the reload performance has been improved from 60 minutes to 30 seconds!)&lt;/em&gt;&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Introduction to Entity Data Model</title><link href="https://en.yangtalks.com/2018/introduction-to-entity-data-model.html" rel="alternate"></link><published>2018-03-08T23:14:00+13:00</published><updated>2018-03-08T23:14:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-03-08:/2018/introduction-to-entity-data-model.html</id><summary type="html">&lt;blockquote&gt;
+&lt;p&gt;There is always something exists for a mysterious reason. 'Mysterious' doesn't mean it is unknown, but we are too lazy to know. The Entity Framework technology is one of those things for me. It was set up at the very …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;blockquote&gt;
+&lt;p&gt;There is always something exists for a mysterious reason. 'Mysterious' doesn't mean it is unknown, but we are too lazy to know. The Entity Framework technology is one of those things for me. It was set up at the very beginning for a solution and it only needs a very little bit maintenance. Detailed instructions have been written and all we need to do is to follow them and make sure nothing is broken. Recently we met a few of issues related to entity framework and it drives me to take some effort on it.&lt;/p&gt;
+&lt;p&gt;While learning on the big topic, I’m going to post some notes as well. I'm going to talk about Entity Framework by sessions in the following few weeks. I will cover as much as I can for the topic and hopefully I can stick to it. Today I'll start with entity data model(EDM), a very core and basic concept in Entity Framework.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Entity Data Model&lt;/h2&gt;
+&lt;p&gt;In terms of model, we have two kinds of types here - one for database and one for the application that we build.&lt;/p&gt;
+&lt;p&gt;On application side, a model particularly means an object of a class that developers code against with. It is from the concept of 'object-oriented' programming and an object is an abstraction of the real world.&lt;/p&gt;
+&lt;p&gt;In database, on the other hand, a model is more likely a schema of how data being stored. As we're talking about relational database, a schema is a database structure that is designed based on [Entity Relationship Model]. &lt;/p&gt;
+&lt;p&gt;To fill the gap between application and database, developers used to manually writing SQLs to handle the communications and conversions.  It takes long time to code and longer time to maintain them. To resolve the complicity and time-wasting, the technology of ORM ([object relational mapping]) came into being. The ORM is trying to build a bridge between database and programming language, helping you do the dirty jobs. &lt;/p&gt;
+&lt;p&gt;Entity Framework is one of ORM technology and Entity Data Model is a middle layer that abstracts entities from database into programming objects. It abstracts the database tables into objects, which you can directly code against with. Also the EDM designer helps you to virtualize you database structures so you could have a greater view of what your data would looks like. What's more, it split the responsibilities of program design and database design. With EDM, you can have your database administrator to design a well normalized database when your developer can comfortably program with business objects. EDM covers the underlying operations.&lt;/p&gt;
+&lt;h2&gt;Example&lt;/h2&gt;
+&lt;p&gt;To make it more sensible, I'm giving(copying) a simple example here:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="DB schema" src="https://en.yangtalks.com/2018/db-schema.png"&gt;&lt;/p&gt;
+&lt;p&gt;The figure shows the schema of a typical set of tables in a database. &lt;code&gt;PersonalDetails&lt;/code&gt; provides additional information about a &lt;code&gt;Person&lt;/code&gt; that the database administrator has chosen to put into a separate table for the sake of scalability. &lt;code&gt;SalesPerson&lt;/code&gt; is a table that is used to provide additional information for those who are salespeople. &lt;/p&gt;
+&lt;p&gt;Working with this data from an application requires queries that are full of inner joins and outer joins to access the additional data about Person records. Or you will access a variety of predefined stored procedures and views, which might each require a different set of parameters and return data that is shaped in a variety of ways. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Entities" src="https://en.yangtalks.com/2018/entities-models.png"&gt;&lt;/p&gt;
+&lt;p&gt;By using EDM, the application could have its own view of what you wish the database looked like. Figure above reshapes the schema. &lt;/p&gt;
+&lt;p&gt;All of the fields from &lt;code&gt;PersonalDetails&lt;/code&gt; are now part of &lt;code&gt;Person&lt;/code&gt;. And &lt;code&gt;SalesPerson&lt;/code&gt; is doing something that is not even possible in a database: it is deriving from &lt;code&gt;Person&lt;/code&gt;, just as you would in an object model. &lt;/p&gt;
+&lt;p&gt;In summary, the Entity Data Model enables you to code against strongly typed entity classes, not database schema and objects. Also it enables you to customize the mappings between entity classes and database tables to move beyond one-to-one mapping or class-to-table mapping.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry></feed>

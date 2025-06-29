@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Running App in Docker (2)</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/docker-compose.html" rel="bookmark"
+        title="Permalink to Running App in Docker (2)">Running App in Docker (2)</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-09-08T20:30:00+12:00">Sat 08 September 2018
+</h6>
+
+
+    <h2>Docker Compose</h2>
+<p><code>docker run</code> can be tedious sometimes if you have a lot of parameters to pass in or you need to re-run the container multiple times.</p>
+<p>Docker Compose is a tool that can help you run the commands via the definition in a <code>yml</code> file. We call the <code>.yml</code> file as "docker-compose file".</p>
+<blockquote>
+<p>YAML is a human friendly data serialization standard for all programming languages.</p>
+</blockquote>
+<h3>Example</h3>
+<p>Our example in <a href="https://en.yangtalks.com/2018/docker-run.html">last post</a> can fit into a "docker-compose" file:</p>
+<div class="highlight"><pre><span></span><code><span class="c">version: &#39;3&#39;</span>
+<span class="c">services:</span>
+<span class="c">rabbit-mq:</span>
+<span class="c">image: rabbitmq:management-alpine</span>
+<span class="c">container_name: dev-rabbitmq</span>
+<span class="c">restart: always</span>
+<span class="c">ports:</span>
+<span class="err">- 15672:15672</span>
+<span class="err">- 5672:5672</span>
+</code></pre></div>
+
+
+<p>You can always find a corresponding config in the file for your <code>docker run</code> command. Then you can start your RabbitMQ with a very few command.</p>
+<div class="highlight"><pre><span></span><code>$ docker-compose up -d
+</code></pre></div>
+
+
+<p>More complicated, we can build serveral services together into one "docker-compose" file:</p>
+<div class="highlight"><pre><span></span><code><span class="k">version</span><span class="p">:</span> <span class="s1">&#39;3&#39;</span>
+<span class="n">services</span><span class="p">:</span>
+<span class="n">redis</span><span class="p">:</span>
+<span class="n">image</span><span class="p">:</span> <span class="n">redis</span><span class="p">:</span><span class="n">alpine</span>
+<span class="n">container_name</span><span class="p">:</span> <span class="n">dev</span><span class="o">-</span><span class="n">redis</span>
+<span class="k">restart</span><span class="p">:</span> <span class="n">always</span>
+<span class="n">ports</span><span class="p">:</span>
+<span class="o">-</span> <span class="mi">6379</span><span class="p">:</span><span class="mi">6379</span>
+<span class="n">networks</span><span class="p">:</span> 
+<span class="o">-</span> <span class="n">devnet</span>
+
+<span class="n">rabbit</span><span class="o">-</span><span class="n">mq</span><span class="p">:</span>
+<span class="n">image</span><span class="p">:</span> <span class="n">rabbitmq</span><span class="p">:</span><span class="n">management</span><span class="o">-</span><span class="n">alpine</span>
+<span class="n">container_name</span><span class="p">:</span> <span class="n">dev</span><span class="o">-</span><span class="n">rabbitmq</span>
+<span class="k">restart</span><span class="p">:</span> <span class="n">always</span>
+<span class="n">ports</span><span class="p">:</span>
+<span class="o">-</span> <span class="mi">15672</span><span class="p">:</span><span class="mi">15672</span>
+<span class="o">-</span> <span class="mi">5672</span><span class="p">:</span><span class="mi">5672</span>
+<span class="n">networks</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">devnet</span>
+
+<span class="n">couch</span><span class="o">-</span><span class="n">db</span><span class="p">:</span>
+<span class="n">container_name</span><span class="p">:</span> <span class="n">dev</span><span class="o">-</span><span class="n">couchdb</span>
+<span class="n">image</span><span class="p">:</span> <span class="n">klaemo</span><span class="o">/</span><span class="n">couchdb</span><span class="p">:</span><span class="n">latest</span>
+<span class="k">restart</span><span class="p">:</span> <span class="n">always</span>
+<span class="n">volumes</span><span class="p">:</span>
+<span class="o">-</span> <span class="p">.</span><span class="o">/</span><span class="n">couchdb</span><span class="o">/</span><span class="k">local</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">couchdb</span><span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="k">local</span><span class="p">.</span><span class="n">d</span>
+<span class="o">-</span> <span class="p">.</span><span class="o">/</span><span class="n">couchdb</span><span class="o">/</span><span class="k">data</span><span class="p">:</span><span class="o">/</span><span class="n">opt</span><span class="o">/</span><span class="n">couchdb</span><span class="o">/</span><span class="k">data</span>
+<span class="n">ports</span><span class="p">:</span>
+<span class="o">-</span> <span class="mi">5984</span><span class="p">:</span><span class="mi">5984</span>
+<span class="n">networks</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">devnet</span>
+
+<span class="n">networks</span><span class="p">:</span>
+<span class="n">devnet</span><span class="p">:</span>
+</code></pre></div>
+
+
+<p>In the above docker-compose file, it also defines a "network" for the containers so that those containers are isolated from other containers.</p>
+<p>Save the configs into a text file named <code>docker-compose.yml</code>. Then you can start all the containers together via the command:</p>
+<div class="highlight"><pre><span></span><code>$ docker-compose up --detach
+</code></pre></div>
+
+
+<p>It will auto load the <code>docker-compose.yml</code> file and start the containers for you. You can also use parameter <code>-f</code> to specify a docker-compose file:</p>
+<div class="highlight"><pre><span></span><code>$ docker-compose up <span class="se">\</span>
+-f docker-compose.yml <span class="se">\</span>
+-d
+</code></pre></div>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/container.html">Container</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/docker.html">docker </a>
+    <a href="https://en.yangtalks.com/tag/container.html">container </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/docker-compose.html";
+        var disqus_url = "https://en.yangtalks.com/2018/docker-compose.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

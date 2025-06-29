@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Entity Data Model Generation</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/edm-generation.html" rel="bookmark"
+        title="Permalink to Entity Data Model Generation">Entity Data Model Generation</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-04-18T23:10:00+12:00">Wed 18 April 2018
+</h6>
+
+
+    <p><strong>Database/Model First</strong></p>
+<p>Let's get one step back and have a quick look at how the conceptual models had been built at the beginning.</p>
+<p>Before we build the database and the program, there's an equal chance for either having database design first or having domain model design first. Initially Visual Studio supports both ways to create the Entity Data Model, one of which called <strong>Database First</strong> and the other called <strong>Model First</strong>.</p>
+<p>The <strong>Database First</strong> utilizes reverse engining to generate the EMD from an existing database. <strong>Model First</strong> is the other way around that the database is created/updated after EDM is finished in the designer.</p>
+<p>With <strong>Database First</strong>, the update direction will always be from database to models. Every changes on databases can be updated to models by redo the operation. On the other hand, in <strong>Model First</strong> any changes to the database may be before you applied them to models. However, Model First allows developers to design the app without concerning too much on database structure, which can help build the prototype quickly.</p>
+<p>These days, the border between these two ways has been becoming more blurrier. They all eventually build up with the EDMX file and can be maintained from the “designer”— either use command <code>Update Model from Database</code> to update the EDM, or <code>Generate Database from Model</code> to create sql scripts re-generating the whole database.</p>
+<p><img alt="Operation in Visual Studio EDMX Designer" src="https://en.yangtalks.com/2018/EDM-designer.png">
+*Operation in Visual Studio EDMX Designer</p>
+<p><strong>Code First</strong></p>
+<p>The <strong>Code First</strong> was a “new” concept since EF 4.1 but it didn’t get much promotion until EF 6. A lot of  improvements were made in EF 6 including Fluent API (<em>to configure EDM mappings by codes</em>) and migration tools(<em>to manage database changes</em>). Hardcore programmers finally got rid of the designer when deal with databases. At the version of EF 6.1, it introduced the ability to generate<strong>Code First</strong> model from database — it helps existing app get transfered to <strong>Code First</strong> if the team wants. </p>
+<p>In EF Core (or EF7), the <strong>Code First</strong> will be the only way to create EDM.( We can tell how much MS is willing to retire the visual designer. The key feature to support “code first” is <strong>migration</strong>, it allows developers update both the classes and database at the same time without losing any data. The migration also makes it possible to upgrade the db at any point to the latest version. The developers will not need to maintain the DB upgrade manually anymore.</p>
+<p>I am in favor of the <strong>Code First</strong> as I really love the idea that maintaining the database via codes. It means by tracking the code changes you’ll be able to have the view of the actually history of the realistic entity.</p>
+<p><img alt="Choose how to create EDM" src="https://en.yangtalks.com/2018/modeling-work-flow-options.png">
+*Choose how to create EDM</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/ef.html">ef </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/edm-generation.html";
+        var disqus_url = "https://en.yangtalks.com/2018/edm-generation.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

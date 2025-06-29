@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>YangTalks - Container</title><link href="https://en.yangtalks.com/" rel="alternate"></link><link href="https://en.yangtalks.com/feeds/container.atom.xml" rel="self"></link><id>https://en.yangtalks.com/</id><updated>2018-09-08T21:30:00+12:00</updated><entry><title>Building Docker Image</title><link href="https://en.yangtalks.com/2018/dockerfile.html" rel="alternate"></link><published>2018-09-08T21:30:00+12:00</published><updated>2018-09-08T21:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-09-08:/2018/dockerfile.html</id><summary type="html">&lt;h2&gt;Dockerfile&lt;/h2&gt;
+&lt;p&gt;Docker images are built from layered containers. The &lt;code&gt;Dockerfile&lt;/code&gt; is a tool that lets you define reproducable docker image.&lt;/p&gt;
+&lt;p&gt;Generally, we are doing a few things inside a Dockerfile to define an image:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Basic Running Environment&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Is your …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Dockerfile&lt;/h2&gt;
+&lt;p&gt;Docker images are built from layered containers. The &lt;code&gt;Dockerfile&lt;/code&gt; is a tool that lets you define reproducable docker image.&lt;/p&gt;
+&lt;p&gt;Generally, we are doing a few things inside a Dockerfile to define an image:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Basic Running Environment&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Is your app running on Linux or Windows? Which version do you prefer? &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Dependent Packages&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;What else packages does your app need? e.g. npm/nuget packages&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. Copy Application&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Copy the generated binary files into the image.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4. Set up interfaces&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Expose the port you want to listen, mounting point you want to monitor, etc.&lt;/p&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;Here is a simple proxy server that I'd like to move it into the container.&lt;/p&gt;
+&lt;p&gt;The App is simple HTTP proxy that attach CORS header for each request to a specific server. (Useful when you can't/don't want to update the API server)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;httpProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http-proxy&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;proxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;httpProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;({});&lt;/span&gt;
+&lt;span class="nx"&gt;proxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;proxyRes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;proxyRes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;req&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;res&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="nx"&gt;proxyRes&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Access-Control-Allow-Origin&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;server&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;req&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;res&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="nx"&gt;proxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;web&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;req&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;res&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="nx"&gt;target&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;process&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;env&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TARGET_URL&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;80&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The code structure is like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;app
+├── index.js
+├── node_modules
+└── package.json
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now let's build an image for it.&lt;/p&gt;
+&lt;p&gt;Firstly, choose to use "Alpine Linux" as its the smallest Linux (5MB)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="s"&gt;alpine&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then install NodeJS and NPM.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;RUN&lt;/span&gt; apk update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk upgrade &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk add --update --no-cache nodejs npm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we can copy our source code into the image.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;COPY&lt;/span&gt; proxy /proxy
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To save the time after the container starts, we should use NPM-installed image.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;RUN&lt;/span&gt; npm install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Lastly, make the Node command as our image entry point. Don't forget to expose port 80 so our app can listen to it.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;EXPOSE&lt;/span&gt;&lt;span class="s"&gt; 80&lt;/span&gt;
+&lt;span class="k"&gt;ENTRYPOINT&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/bin/sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;node /proxy/index.js&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now let's get them together to see how a Dockerfile looks like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="s"&gt;alpine&lt;/span&gt;
+&lt;span class="k"&gt;RUN&lt;/span&gt; apk update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk upgrade &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk add --update --no-cache nodejs npm
+&lt;span class="k"&gt;COPY&lt;/span&gt; proxy /proxy
+&lt;span class="k"&gt;RUN&lt;/span&gt; npm install
+&lt;span class="k"&gt;EXPOSE&lt;/span&gt;&lt;span class="s"&gt; 80&lt;/span&gt;
+&lt;span class="k"&gt;ENTRYPOINT&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/bin/sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;node /proxy/index.js&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>Running App in Docker (2)</title><link href="https://en.yangtalks.com/2018/docker-compose.html" rel="alternate"></link><published>2018-09-08T20:30:00+12:00</published><updated>2018-09-08T20:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-09-08:/2018/docker-compose.html</id><summary type="html">&lt;h2&gt;Docker Compose&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt; can be tedious sometimes if you have a lot of parameters to pass in or you need to re-run the container multiple times.&lt;/p&gt;
+&lt;p&gt;Docker Compose is a tool that can help you run the commands via …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Docker Compose&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt; can be tedious sometimes if you have a lot of parameters to pass in or you need to re-run the container multiple times.&lt;/p&gt;
+&lt;p&gt;Docker Compose is a tool that can help you run the commands via the definition in a &lt;code&gt;yml&lt;/code&gt; file. We call the &lt;code&gt;.yml&lt;/code&gt; file as "docker-compose file".&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;YAML is a human friendly data serialization standard for all programming languages.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;Our example in &lt;a href="https://en.yangtalks.com/2018/docker-run.html"&gt;last post&lt;/a&gt; can fit into a "docker-compose" file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;version: &amp;#39;3&amp;#39;&lt;/span&gt;
+&lt;span class="c"&gt;services:&lt;/span&gt;
+&lt;span class="c"&gt;rabbit-mq:&lt;/span&gt;
+&lt;span class="c"&gt;image: rabbitmq:management-alpine&lt;/span&gt;
+&lt;span class="c"&gt;container_name: dev-rabbitmq&lt;/span&gt;
+&lt;span class="c"&gt;restart: always&lt;/span&gt;
+&lt;span class="c"&gt;ports:&lt;/span&gt;
+&lt;span class="err"&gt;- 15672:15672&lt;/span&gt;
+&lt;span class="err"&gt;- 5672:5672&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can always find a corresponding config in the file for your &lt;code&gt;docker run&lt;/code&gt; command. Then you can start your RabbitMQ with a very few command.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker-compose up -d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;More complicated, we can build serveral services together into one "docker-compose" file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;3&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;redis&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;redis&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;alpine&lt;/span&gt;
+&lt;span class="n"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;redis&lt;/span&gt;
+&lt;span class="k"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt;
+&lt;span class="n"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;6379&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;6379&lt;/span&gt;
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; 
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;devnet&lt;/span&gt;
+
+&lt;span class="n"&gt;rabbit&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;mq&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rabbitmq&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;management&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;alpine&lt;/span&gt;
+&lt;span class="n"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;rabbitmq&lt;/span&gt;
+&lt;span class="k"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt;
+&lt;span class="n"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;15672&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;15672&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;5672&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;5672&lt;/span&gt;
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;devnet&lt;/span&gt;
+
+&lt;span class="n"&gt;couch&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;
+&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;klaemo&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;latest&lt;/span&gt;
+&lt;span class="k"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt;
+&lt;span class="n"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;local&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;etc&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;local&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;data&lt;/span&gt;
+&lt;span class="n"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;5984&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;5984&lt;/span&gt;
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;devnet&lt;/span&gt;
+
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;devnet&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In the above docker-compose file, it also defines a "network" for the containers so that those containers are isolated from other containers.&lt;/p&gt;
+&lt;p&gt;Save the configs into a text file named &lt;code&gt;docker-compose.yml&lt;/code&gt;. Then you can start all the containers together via the command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker-compose up --detach
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will auto load the &lt;code&gt;docker-compose.yml&lt;/code&gt; file and start the containers for you. You can also use parameter &lt;code&gt;-f&lt;/code&gt; to specify a docker-compose file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker-compose up &lt;span class="se"&gt;\&lt;/span&gt;
+-f docker-compose.yml &lt;span class="se"&gt;\&lt;/span&gt;
+-d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>Running App in Docker (1)</title><link href="https://en.yangtalks.com/2018/docker-run.html" rel="alternate"></link><published>2018-09-08T19:30:00+12:00</published><updated>2018-09-08T19:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-09-08:/2018/docker-run.html</id><summary type="html">&lt;h2&gt;Docker Run&lt;/h2&gt;
+&lt;p&gt;When you are likely to run a container on your own machine, you need two steps.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Find the image repository and a proper tag.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;docker run&lt;/code&gt; to set container runtime parameters and then start.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;We'd like …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Docker Run&lt;/h2&gt;
+&lt;p&gt;When you are likely to run a container on your own machine, you need two steps.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Find the image repository and a proper tag.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;docker run&lt;/code&gt; to set container runtime parameters and then start.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;We'd like to run a RabbitMQ on your local machine. First, we choose an image from the &lt;a href="https://hub.docker.com/_/rabbitmq/"&gt;official repository&lt;/a&gt;. E.g. we choose &lt;code&gt;rabbitmq:management-alpine&lt;/code&gt;. So we got the basic command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker run rabbitmq:management-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To add port forwarding to the container, we need to specify the &lt;code&gt;-p&lt;/code&gt; parameter:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker run &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;5672&lt;/span&gt;:5672 &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;15672&lt;/span&gt;:15672 &lt;span class="se"&gt;\&lt;/span&gt;
+rabbitmq:management-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It replace our host port &lt;code&gt;5672&lt;/code&gt; and &lt;code&gt;15672&lt;/code&gt; with the container's.&lt;/p&gt;
+&lt;p&gt;After that, we'd like to give a reasonable name to the container and ask the container auto start after my docker daemon is restarted. So I need to add command &lt;code&gt;--name&lt;/code&gt; and &lt;code&gt;--restart&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker run &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;5672&lt;/span&gt;:5672 &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;15672&lt;/span&gt;:15672 &lt;span class="se"&gt;\&lt;/span&gt;
+--name dev-rabbitmq &lt;span class="se"&gt;\&lt;/span&gt;
+--restart always &lt;span class="se"&gt;\&lt;/span&gt;
+-d &lt;span class="se"&gt;\&lt;/span&gt;
+rabbitmq:management-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And don't forget the &lt;code&gt;-d&lt;/code&gt; if you don't want to attach the container STDIN/STDOUT.&lt;/p&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>1998 ~ 2018 -- from Server to Container</title><link href="https://en.yangtalks.com/2018/docker-2.html" rel="alternate"></link><published>2018-08-10T20:30:00+12:00</published><updated>2018-08-10T20:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-08-10:/2018/docker-2.html</id><summary type="html">&lt;p&gt;&lt;em&gt;A recap from an internal sharing session&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The technology develops in two ways, improving with the existing one and taking a breaking through.&lt;/p&gt;
+&lt;p&gt;20 years ago, in the year of 1998, the servers were running on physical servers. There is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;A recap from an internal sharing session&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The technology develops in two ways, improving with the existing one and taking a breaking through.&lt;/p&gt;
+&lt;p&gt;20 years ago, in the year of 1998, the servers were running on physical servers. There is very few things we can do to recover from a disaster. A common approach is to have one or more mirror servers standby regardless if they are needed. Once one of the server is down, the alternative servers can save you a little time to recover.&lt;/p&gt;
+&lt;p&gt;The downside with this server generation, one is that it is very difficult to determine how many servers need to preserve for your uncertain traffic. Another one is that you have to run a lot more servers than you need if you have multiple services deployed separately.&lt;/p&gt;
+&lt;p&gt;10 years ago, in year of 2008, virtualization technology was getting very mature for production using. Multiple virtual machine can be running simultaneously on one physical server. The virtual machine supports backup to a snapshot and restore from it. So if needed, we can easily create a copy of our server and scale up on demands.&lt;/p&gt;
+&lt;p&gt;Speaking of virtual machine, I have to mention AWS EC2 service. EC2 is short for Elastic Compute Cloud. It is an online virtual machine service that provided by Amazon. Based on different scenarios, the users can run various numbers of EC2 instances with different specs. &lt;/p&gt;
+&lt;p&gt;The users also can choose to create an Amazon Machine Image from a running EC2 instance. An AMI is a snapshot of a virtual machine. The user can reuse their own AMI or share their AMI with other users or public. With the flexibility from EC2 and AMI, the applications that deployed on AWS can be easily maintained or scaled.&lt;/p&gt;
+&lt;p&gt;One of the biggest advantage of virtual machine is isolation. The software running in the guest OS is fully isolated from the host OS and other virtual machines. The isolation makes sure the application in each VM is running safely and independently. &lt;/p&gt;
+&lt;p&gt;The flaw of VM is very obvious as well. The target application needs to be running in a guest operating system that based on a set of virtualized hardwares. The computing resources can be wasted heavily on those overheads.&lt;/p&gt;
+&lt;p&gt;A practical improvement in virtualization is to replace the host OS with hypervisor, which is a specific software that manage virtual machines on top of the hardwares. In this case, we can save some overhead from the host OS.&lt;/p&gt;
+&lt;p&gt;So is there any technology that is able to adopt the highly isolated environment as well as efficiency? &lt;/p&gt;
+&lt;p&gt;Yes, it's container.&lt;/p&gt;
+&lt;p&gt;Containerization includes two key technologies. One of them is &lt;strong&gt;Linux Namespace&lt;/strong&gt;. Linux Namespace helps provide an isolated environment (including process management, users, etc.) for process to run. The other one is &lt;strong&gt;cgroups&lt;/strong&gt;, which is designed to isolate and control resources that process is using. With these technologies, even your application is still running in the host OS, they (the app) will think themselves as running in a full OS.&lt;/p&gt;
+&lt;p&gt;As we can see, the environment of the process is isolated from the current operating system. In this case, we don’t need to virtualize the hardware and the guest OS anymore. The hardware resources are getting well utilized.&lt;/p&gt;
+&lt;p&gt;So far, we haven't mentioned anything about docker. Simply because the key technology of containerization has nothing to do with docker. Docker wrapped the dirty jobs for us so we can create container easier. (For anyone interested can refer &lt;a href="https://ericchiang.github.io/post/containers-from-scratch/"&gt;this article&lt;/a&gt; to build a container without Docker)&lt;/p&gt;
+&lt;h2&gt;Q&amp;amp;A&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;1. When we run a container of 'Ubuntu', is it running a real Ubuntu in my host machine or not?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Yes it will be a ‘Ubuntu’ but share the kernel with the host. The Ubuntu image will provide everything except Linux kernel. If your application needs a different kernel version than your host (which is very rare), you’ll need a VM for your app then.&lt;/p&gt;
+&lt;p&gt;I found a blog explaining more around kernel space and user space (&lt;a href="https://rhelblog.redhat.com/2015/07/29/architecting-containers-part-1-user-space-vs-kernel-space/"&gt;part 1&lt;/a&gt;, &lt;a href="https://rhelblog.redhat.com/2015/09/17/architecting-containers-part-2-why-the-user-space-matters-2/"&gt;part 2&lt;/a&gt;).  And the &lt;a href="https://hub.docker.com/_/ubuntu/"&gt;Ubuntu image’s Dockerfile&lt;/a&gt; also explains how it is built.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. How do the images work? If I have many images, does it mean I also have all the copies?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The container provides OS kernel, each image provides a “mounting” file system. There is a base image &lt;a href="https://docs.docker.com/samples/library/scratch/"&gt;“scratch”&lt;/a&gt; that contains almost nothing. Every docker image is built on top of another image. The ‘scratch’ image is the very root of them. Docker is adopting UnionFS to operate with image/container data. Take a look at &lt;a href="https://docs.docker.com/storage/storagedriver/"&gt;this article&lt;/a&gt; to understand how docker image layers work.  &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. When running container on Windows, is it running natively or still via the hyper-v?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Just had a look at &lt;a href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/about/"&gt;this post&lt;/a&gt; from Microsoft. Windows container has two types of container, one is Windows Server Containers which is similar to Linux Container that sharing kernel between containers, the other is Hyper-V Isolation which is running a highly optimized Windows virtual machine.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4. What’s the differences between image for windows container and image for linux container?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The containers share kernel with host OS, so only image that support the host kernel can be created in a container. In windows, we run a Linux container in a Linux virtual machine (docker host).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;5. How do the images manage their versions?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Each image name contains three parts: registry, name and tag. The default registry is &lt;code&gt;docker.io&lt;/code&gt; and the default tag is &lt;code&gt;latest&lt;/code&gt;. Different version of the same image has different tag. For instance, &lt;a href="https://hub.docker.com/r/microsoft/dotnet-framework/"&gt;dotnet-framework&lt;/a&gt;has tags ‘4.7.2’, ‘4.7’, 4.6’ to differentiate each version.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6. When I run a container without specify the image version, am I always getting the latest version?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;docker run&lt;/code&gt; command will first try get the image from your local and then pull from server. So if you local repository happen cached the “latest” version, it won’t bother to pull another time. In this case you need to manually run &lt;code&gt;docker pull&lt;/code&gt; to update your local image.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;7. When ship the app, which way is better? Build image with application, or provision the container with the app after it is up.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Because it is relatively cheap to build a docker image. Instead of running a lot overhead after a container started, it is better to wrap all you application into an image and deploy it directly on your server.&lt;/p&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry></feed>

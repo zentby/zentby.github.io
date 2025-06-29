@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Introduction to Entity Data Model</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/introduction-to-entity-data-model.html" rel="bookmark"
+        title="Permalink to Introduction to Entity Data Model">Introduction to Entity Data Model</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-03-08T23:14:00+13:00">Thu 08 March 2018
+</h6>
+
+
+    <blockquote>
+<p>There is always something exists for a mysterious reason. 'Mysterious' doesn't mean it is unknown, but we are too lazy to know. The Entity Framework technology is one of those things for me. It was set up at the very beginning for a solution and it only needs a very little bit maintenance. Detailed instructions have been written and all we need to do is to follow them and make sure nothing is broken. Recently we met a few of issues related to entity framework and it drives me to take some effort on it.</p>
+<p>While learning on the big topic, I’m going to post some notes as well. I'm going to talk about Entity Framework by sessions in the following few weeks. I will cover as much as I can for the topic and hopefully I can stick to it. Today I'll start with entity data model(EDM), a very core and basic concept in Entity Framework.</p>
+</blockquote>
+<h2>Entity Data Model</h2>
+<p>In terms of model, we have two kinds of types here - one for database and one for the application that we build.</p>
+<p>On application side, a model particularly means an object of a class that developers code against with. It is from the concept of 'object-oriented' programming and an object is an abstraction of the real world.</p>
+<p>In database, on the other hand, a model is more likely a schema of how data being stored. As we're talking about relational database, a schema is a database structure that is designed based on [Entity Relationship Model]. </p>
+<p>To fill the gap between application and database, developers used to manually writing SQLs to handle the communications and conversions.  It takes long time to code and longer time to maintain them. To resolve the complicity and time-wasting, the technology of ORM ([object relational mapping]) came into being. The ORM is trying to build a bridge between database and programming language, helping you do the dirty jobs. </p>
+<p>Entity Framework is one of ORM technology and Entity Data Model is a middle layer that abstracts entities from database into programming objects. It abstracts the database tables into objects, which you can directly code against with. Also the EDM designer helps you to virtualize you database structures so you could have a greater view of what your data would looks like. What's more, it split the responsibilities of program design and database design. With EDM, you can have your database administrator to design a well normalized database when your developer can comfortably program with business objects. EDM covers the underlying operations.</p>
+<h2>Example</h2>
+<p>To make it more sensible, I'm giving(copying) a simple example here:</p>
+<p><img alt="DB schema" src="https://en.yangtalks.com/2018/db-schema.png"></p>
+<p>The figure shows the schema of a typical set of tables in a database. <code>PersonalDetails</code> provides additional information about a <code>Person</code> that the database administrator has chosen to put into a separate table for the sake of scalability. <code>SalesPerson</code> is a table that is used to provide additional information for those who are salespeople. </p>
+<p>Working with this data from an application requires queries that are full of inner joins and outer joins to access the additional data about Person records. Or you will access a variety of predefined stored procedures and views, which might each require a different set of parameters and return data that is shaped in a variety of ways. </p>
+<p><img alt="Entities" src="https://en.yangtalks.com/2018/entities-models.png"></p>
+<p>By using EDM, the application could have its own view of what you wish the database looked like. Figure above reshapes the schema. </p>
+<p>All of the fields from <code>PersonalDetails</code> are now part of <code>Person</code>. And <code>SalesPerson</code> is doing something that is not even possible in a database: it is deriving from <code>Person</code>, just as you would in an object model. </p>
+<p>In summary, the Entity Data Model enables you to code against strongly typed entity classes, not database schema and objects. Also it enables you to customize the mappings between entity classes and database tables to move beyond one-to-one mapping or class-to-table mapping.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/ef.html">ef </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/introduction-to-entity-data-model.html";
+        var disqus_url = "https://en.yangtalks.com/2018/introduction-to-entity-data-model.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

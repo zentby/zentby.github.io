@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>YangTalks - Serverless</title><link href="https://en.yangtalks.com/" rel="alternate"></link><link href="https://en.yangtalks.com/feeds/serverless.atom.xml" rel="self"></link><id>https://en.yangtalks.com/</id><updated>2020-07-12T21:30:00+12:00</updated><entry><title>Step by step starting serverless asp.net</title><link href="https://en.yangtalks.com/2020/dotnet-lambda-serverless.html" rel="alternate"></link><published>2020-07-12T21:30:00+12:00</published><updated>2020-07-12T21:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2020-07-12:/2020/dotnet-lambda-serverless.html</id><summary type="html">&lt;p&gt;The CSOD "Spring" Hackathon was held last week. My team spent a whole day to help me finish an ambitious idea. Though we didn't win the competition in the end, we had a lot of fun and did learn many …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The CSOD "Spring" Hackathon was held last week. My team spent a whole day to help me finish an ambitious idea. Though we didn't win the competition in the end, we had a lot of fun and did learn many things.&lt;/p&gt;
+&lt;p&gt;The AWS lambda serverless with dotnetcore, one of "new" technologies that we used during the event, surprised me with its simplicity and dev-friendliness. It's something could be used for a very quick prototyping in the future. &lt;/p&gt;
+&lt;p&gt;Here's how we built up a &lt;strong&gt;production ready&lt;/strong&gt; REST backend in a few easy steps.&lt;/p&gt;
+&lt;p&gt;Before start, we decided our backend stack as &lt;em&gt;asp.net core&lt;/em&gt; + &lt;em&gt;MySql&lt;/em&gt;. The asp.net core will be transformed to &lt;em&gt;api gateway + lambda&lt;/em&gt;, while the MySql will be replaced by the &lt;em&gt;Aurora Serverless&lt;/em&gt;. A pure serverless architecture.&lt;/p&gt;
+&lt;p&gt;First of all, we need to get a local MySQL up and running. It can be easily accomplished by a &lt;code&gt;docker-compose&lt;/code&gt;, nice and clean:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;3.3&amp;#39;&lt;/span&gt;
+
+&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+
+  &lt;span class="nt"&gt;db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;mysql&lt;/span&gt;
+    &lt;span class="nt"&gt;command&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;--default-authentication-plugin=mysql_native_password&lt;/span&gt;
+    &lt;span class="nt"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;always&lt;/span&gt;
+    &lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;3306:3306&amp;#39;&lt;/span&gt;
+    &lt;span class="nt"&gt;environment&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_DATABASE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;db&amp;#39;&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_USER&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;user&amp;#39;&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_PASSWORD&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;password&amp;#39;&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_ROOT_PASSWORD&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;password&amp;#39;&lt;/span&gt;
+    &lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;my-db:/var/lib/mysql&lt;/span&gt;
+
+  &lt;span class="nt"&gt;adminer&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;adminer&lt;/span&gt;
+    &lt;span class="nt"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;always&lt;/span&gt;
+    &lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;8080:8080&lt;/span&gt;
+&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+  &lt;span class="nt"&gt;my-db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Second step, scaffolding the asp.net serverless project. Amazon engineering team provided &lt;a href="https://github.com/aws/aws-extensions-for-dotnet-cli#aws-lambda-amazonlambdatools"&gt;a set of tools integrated with dotnet-cli&lt;/a&gt;, which contains a few of serverless templates. &lt;/p&gt;
+&lt;h3&gt;1) Install global tools set&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet tool install -g Amazon.Lambda.Tools
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;2) Install project templates&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet new -i &lt;span class="s2"&gt;&amp;quot;Amazon.Lambda.Templates::*&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To view the installed lambda templates, run&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet new lambda --list
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;3) Create new project with serverless template&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet new serverless.AspNetCoreWebAPI -n serverless
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will create a folder of &lt;code&gt;example&lt;/code&gt; with the structure&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;example
+├── src
+│   └── serverless
+│       ├── Controllers
+│       │   ├── S3ProxyController.cs
+│       │   └── ValuesController.cs
+│       ├── LambdaEntryPoint.cs
+│       ├── LocalEntryPoint.cs
+│       ├── Readme.md
+│       ├── Startup.cs
+│       ├── appsettings.Development.json
+│       ├── appsettings.json
+│       ├── aws-lambda-tools-defaults.json
+│       ├── serverless.csproj
+│       └── serverless.template
+└── test/*        &lt;span class="c1"&gt;# test projects folder&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The files are almost minimal to develop and deploy the application. Let's quickly walk though the key files&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;aws-lambda-tools-defaults.json&lt;/code&gt;: Used for &lt;code&gt;dotnet lambda&lt;/code&gt; cli command. It defines the necessary deployment parameters.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;serverless.template&lt;/code&gt;: CloudFormation template that defines the resources to be created in the deployment. By default, it already includes a lambda definition with &lt;code&gt;proxy+&lt;/code&gt; API Gateway trigger.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LambdaEntryPoint.cs&lt;/code&gt;: The class wrapped with built-in &lt;code&gt;APIGatewayProxyFunction&lt;/code&gt; to enable lambda hosting the web app.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LocalEntryPoint.cs&lt;/code&gt;: Local asp.net hosting entrance that uses Kestrel.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Startup.cs&lt;/code&gt;: Where all the configurations and warmup happen for both local and lambda.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;S3ProxyController.cs&lt;/code&gt;: A sample controller with AWS s3 client, where we can start to build our app straightforward.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;4) Integrate with EF core&lt;/h3&gt;
+&lt;p&gt;As part of dotnetcore family, Entity Framework Core could be easily integrated within an asp.net project.&lt;/p&gt;
+&lt;p&gt;There is also a dotnet-cli tools set for EF core. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet tool install --global dotnet-ef
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The cli sets provides a few useful commands to manage DbContext and DbMigrations. For more information, refer to &lt;a href="https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To add MySql, you need to install another package via &lt;code&gt;dotnet package add&lt;/code&gt; command. The full provider plugins could be found &lt;a href="https://docs.microsoft.com/en-us/ef/core/providers/?tabs=dotnet-core-cli"&gt;here&lt;/a&gt;. We used the &lt;a href="https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql"&gt;Pomelo.EntityFrameworkCore.MySql&lt;/a&gt; for our project.&lt;/p&gt;
+&lt;p&gt;Once it's connected, put the &lt;code&gt;ConnectionString&lt;/code&gt; into an config file or environment variable. Then goto AWS RDS console, create an Aurora Serverless database and get the connection link. Put the link into your production configuration.&lt;/p&gt;
+&lt;h3&gt;5) Development and deployment&lt;/h3&gt;
+&lt;p&gt;To start coding, we just need to code as our normal asp.net project. Open the project with your favorite IDE.&lt;/p&gt;
+&lt;p&gt;To deploy your project, just get your AWS api key setup locally and run command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet lambda deploy-serverless
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will automatically load settings in &lt;code&gt;aws-lambda-tools-defaults.json&lt;/code&gt; (if not, then prompt to ask for input).&lt;/p&gt;
+&lt;p&gt;At the end of deployment, you'll get an API url:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Output Name                    Value
+------------------------------ --------------------------------------------------
+ApiURL                         https://xxxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Till now, our backend project is ready for client consuming. &lt;/p&gt;</content><category term="Serverless"></category><category term="aws"></category><category term="serverless"></category><category term="dotnetcore"></category></entry></feed>

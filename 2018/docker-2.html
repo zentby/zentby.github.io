@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>1998 ~ 2018 -- from Server to Container</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/docker-2.html" rel="bookmark"
+        title="Permalink to 1998 ~ 2018 -- from Server to Container">1998 ~ 2018 -- from Server to Container</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-08-10T20:30:00+12:00">Fri 10 August 2018
+</h6>
+
+
+    <p><em>A recap from an internal sharing session</em></p>
+<p>The technology develops in two ways, improving with the existing one and taking a breaking through.</p>
+<p>20 years ago, in the year of 1998, the servers were running on physical servers. There is very few things we can do to recover from a disaster. A common approach is to have one or more mirror servers standby regardless if they are needed. Once one of the server is down, the alternative servers can save you a little time to recover.</p>
+<p>The downside with this server generation, one is that it is very difficult to determine how many servers need to preserve for your uncertain traffic. Another one is that you have to run a lot more servers than you need if you have multiple services deployed separately.</p>
+<p>10 years ago, in year of 2008, virtualization technology was getting very mature for production using. Multiple virtual machine can be running simultaneously on one physical server. The virtual machine supports backup to a snapshot and restore from it. So if needed, we can easily create a copy of our server and scale up on demands.</p>
+<p>Speaking of virtual machine, I have to mention AWS EC2 service. EC2 is short for Elastic Compute Cloud. It is an online virtual machine service that provided by Amazon. Based on different scenarios, the users can run various numbers of EC2 instances with different specs. </p>
+<p>The users also can choose to create an Amazon Machine Image from a running EC2 instance. An AMI is a snapshot of a virtual machine. The user can reuse their own AMI or share their AMI with other users or public. With the flexibility from EC2 and AMI, the applications that deployed on AWS can be easily maintained or scaled.</p>
+<p>One of the biggest advantage of virtual machine is isolation. The software running in the guest OS is fully isolated from the host OS and other virtual machines. The isolation makes sure the application in each VM is running safely and independently. </p>
+<p>The flaw of VM is very obvious as well. The target application needs to be running in a guest operating system that based on a set of virtualized hardwares. The computing resources can be wasted heavily on those overheads.</p>
+<p>A practical improvement in virtualization is to replace the host OS with hypervisor, which is a specific software that manage virtual machines on top of the hardwares. In this case, we can save some overhead from the host OS.</p>
+<p>So is there any technology that is able to adopt the highly isolated environment as well as efficiency? </p>
+<p>Yes, it's container.</p>
+<p>Containerization includes two key technologies. One of them is <strong>Linux Namespace</strong>. Linux Namespace helps provide an isolated environment (including process management, users, etc.) for process to run. The other one is <strong>cgroups</strong>, which is designed to isolate and control resources that process is using. With these technologies, even your application is still running in the host OS, they (the app) will think themselves as running in a full OS.</p>
+<p>As we can see, the environment of the process is isolated from the current operating system. In this case, we don’t need to virtualize the hardware and the guest OS anymore. The hardware resources are getting well utilized.</p>
+<p>So far, we haven't mentioned anything about docker. Simply because the key technology of containerization has nothing to do with docker. Docker wrapped the dirty jobs for us so we can create container easier. (For anyone interested can refer <a href="https://ericchiang.github.io/post/containers-from-scratch/">this article</a> to build a container without Docker)</p>
+<h2>Q&amp;A</h2>
+<p><strong>1. When we run a container of 'Ubuntu', is it running a real Ubuntu in my host machine or not?</strong></p>
+<p>Yes it will be a ‘Ubuntu’ but share the kernel with the host. The Ubuntu image will provide everything except Linux kernel. If your application needs a different kernel version than your host (which is very rare), you’ll need a VM for your app then.</p>
+<p>I found a blog explaining more around kernel space and user space (<a href="https://rhelblog.redhat.com/2015/07/29/architecting-containers-part-1-user-space-vs-kernel-space/">part 1</a>, <a href="https://rhelblog.redhat.com/2015/09/17/architecting-containers-part-2-why-the-user-space-matters-2/">part 2</a>).  And the <a href="https://hub.docker.com/_/ubuntu/">Ubuntu image’s Dockerfile</a> also explains how it is built.</p>
+<p><strong>2. How do the images work? If I have many images, does it mean I also have all the copies?</strong></p>
+<p>The container provides OS kernel, each image provides a “mounting” file system. There is a base image <a href="https://docs.docker.com/samples/library/scratch/">“scratch”</a> that contains almost nothing. Every docker image is built on top of another image. The ‘scratch’ image is the very root of them. Docker is adopting UnionFS to operate with image/container data. Take a look at <a href="https://docs.docker.com/storage/storagedriver/">this article</a> to understand how docker image layers work.  </p>
+<p><strong>3. When running container on Windows, is it running natively or still via the hyper-v?</strong></p>
+<p>Just had a look at <a href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/about/">this post</a> from Microsoft. Windows container has two types of container, one is Windows Server Containers which is similar to Linux Container that sharing kernel between containers, the other is Hyper-V Isolation which is running a highly optimized Windows virtual machine.</p>
+<p><strong>4. What’s the differences between image for windows container and image for linux container?</strong></p>
+<p>The containers share kernel with host OS, so only image that support the host kernel can be created in a container. In windows, we run a Linux container in a Linux virtual machine (docker host).</p>
+<p><strong>5. How do the images manage their versions?</strong></p>
+<p>Each image name contains three parts: registry, name and tag. The default registry is <code>docker.io</code> and the default tag is <code>latest</code>. Different version of the same image has different tag. For instance, <a href="https://hub.docker.com/r/microsoft/dotnet-framework/">dotnet-framework</a>has tags ‘4.7.2’, ‘4.7’, 4.6’ to differentiate each version.</p>
+<p><strong>6. When I run a container without specify the image version, am I always getting the latest version?</strong></p>
+<p>The <code>docker run</code> command will first try get the image from your local and then pull from server. So if you local repository happen cached the “latest” version, it won’t bother to pull another time. In this case you need to manually run <code>docker pull</code> to update your local image.</p>
+<p><strong>7. When ship the app, which way is better? Build image with application, or provision the container with the app after it is up.</strong></p>
+<p>Because it is relatively cheap to build a docker image. Instead of running a lot overhead after a container started, it is better to wrap all you application into an image and deploy it directly on your server.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/container.html">Container</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/docker.html">docker </a>
+    <a href="https://en.yangtalks.com/tag/container.html">container </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/docker-2.html";
+        var disqus_url = "https://en.yangtalks.com/2018/docker-2.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

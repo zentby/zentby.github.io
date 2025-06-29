@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Way to typescript</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/way-to-typescript.html" rel="bookmark"
+        title="Permalink to Way to typescript">Way to typescript</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-07-13T20:30:00+12:00">Fri 13 July 2018
+</h6>
+
+
+    <p><img alt="grunt-typescript" src="https://en.yangtalks.com/2018/grunt-ts.jpg"></p>
+<p>Recently team <strong>BOLT</strong> just upgraded the NPM packages in <strong>Unleashed.UI</strong> project and enabled the support of Typescript in the AngularJS app.</p>
+<p><strong>TL;DR</strong>
+The key to support TS in Unleashed.UI is to install the required packages and integrate with existing Grunt tasks. This article will give a quick catchup of what Grunt is and how we integrate typescript with it in Unleashed solution.</p>
+<h2>What's Grunt</h2>
+<p>Unleashed.UI project uses Grunt as it's packing tools. In front-end world, a packing tool is used to process your code from writting language/format to a small/compatitable/performant version for real-world browsers. </p>
+<p>Strictly speaking, Grunt is not a packing tool. It is designed as a "<strong>Task Runner</strong>" that techinically can run every program on the machine. It has thousands of plugins for different scenarios to use. Packing a web application is one of the most common one. </p>
+<h2>Understand the Grunt tasks</h2>
+<p>Let's dive into the Grunt in Unleashed repo.</p>
+<p>The Grunt auto loads the definitions of tasks from a <code>Gruntfile</code>. It looks for the default name <code>Gruntfile.js</code> or <code>Gruntfile.coffee</code> under the same folder. (Only the config supports CoffeeScript natively) 
+<em>The file can also be specified with option <code>--Gruntfile &lt;filename&gt;</code>.</em></p>
+<p>A task can be declared in two ways. One of them is to load tasks from plugin - NPM packages.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">grunt</span><span class="p">.</span><span class="nx">loadNpmTasks</span><span class="p">(</span><span class="s1">&#39;grunt-contrib-clean&#39;</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p>The other way is to call <code>registerTask</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;default&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;clean&#39;</span><span class="p">,</span> <span class="s1">&#39;build&#39;</span><span class="p">]);</span>
+<span class="nx">grunt</span><span class="p">.</span><span class="nx">registerTask</span><span class="p">(</span><span class="s1">&#39;buildScript&#39;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">grunt</span><span class="p">.</span><span class="nx">task</span><span class="p">.</span><span class="nx">run</span><span class="p">([</span><span class="s1">&#39;ngtemplates&#39;</span><span class="p">]);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">target</span> <span class="o">===</span> <span class="s1">&#39;dist&#39;</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">grunt</span><span class="p">.</span><span class="nx">task</span><span class="p">.</span><span class="nx">run</span><span class="p">([</span><span class="s1">&#39;browserify:dist&#39;</span><span class="p">,</span> <span class="s1">&#39;uglify:dist&#39;</span><span class="p">]);</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+      <span class="nx">grunt</span><span class="p">.</span><span class="nx">task</span><span class="p">.</span><span class="nx">run</span><span class="p">([</span><span class="s1">&#39;browserify:debug&#39;</span><span class="p">,</span> <span class="s1">&#39;concat:js&#39;</span><span class="p">]);</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">grunt</span><span class="p">.</span><span class="nx">task</span><span class="p">.</span><span class="nx">run</span><span class="p">([</span><span class="s1">&#39;copy:scripts&#39;</span><span class="p">]);</span>
+  <span class="p">});</span>
+</code></pre></div>
+
+
+<p>The tasks loaded into grunt will be saved in key-value pairs. Each key represents the task name and the value is either the task option or the task implementation (function). You can run a specific task either by direct call with command <code>grunt &lt;task name&gt;</code> or within another task. </p>
+<p>In the above example, the task 'default' is defined to run task 'clean' and 'build'. The task 'buildScript' is a function that has our own implementation.</p>
+<h2>Task Types</h2>
+<ul>
+<li>Task from a grunt plugin</li>
+</ul>
+<p>You can install a Grunt plugin from NPM. For example, the task 'clean' was from a plugin <code>grunt-contrib-clean</code>. It can be installed as dev-dependencies:</p>
+<div class="highlight"><pre><span></span><code>npm install --save-dev grunt-contrib-clean
+</code></pre></div>
+
+
+<p>Afterward we can load the tasks from the plugin with <code>grunt.loadNpmTasks(...)</code>. The usage/option usually can be found at its website, e.g. https://www.npmjs.com/package/grunt-contrib-clean. </p>
+<ul>
+<li>Task to Run Multiple Tasks</li>
+</ul>
+<p>The value of the task definition is an array of string, e.g. <code>'default': ['clean', 'build']</code>. It helps to run multiple tasks with one command. It will run the tasks in sequence.</p>
+<ul>
+<li>Custom Task</li>
+</ul>
+<p>Grunt supports to register a task as a function. When run the task it will just run the function. The function also supports parameters by using colon: <code>buildScript:dist</code> equals to <code>buildScript(dist)</code>. In each function you can run other tasks with method <code>grunt.task.run</code> function.</p>
+<h2>Configurations</h2>
+<p>The options for each task is usually passed in with the object when initialize. 
+e.g. </p>
+<div class="highlight"><pre><span></span><code><span class="nx">grunt</span><span class="p">.</span><span class="nx">initConfig</span><span class="p">({</span>
+        <span class="nx">clean</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">options</span><span class="o">:</span> <span class="p">{</span><span class="nx">force</span><span class="o">:</span> <span class="kc">true</span><span class="p">}</span>
+            <span class="nx">dist</span><span class="o">:</span> <span class="p">{</span><span class="nx">files</span><span class="o">:</span> <span class="p">[{</span> <span class="nx">dot</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span> <span class="nx">src</span><span class="o">:</span> <span class="p">[</span> <span class="s1">&#39;&lt;%= config.tmp %&gt;&#39;</span><span class="p">,</span> <span class="s1">&#39;&lt;%= config.dist %&gt;&#39;</span><span class="p">]}]}</span>
+        <span class="p">}</span>
+    <span class="p">})</span>
+</code></pre></div>
+
+
+<h2>Task "browserify"</h2>
+<p>The project <a href="http://browserify.org/">browserify</a> resolves the usage of 'require' for browsers. It bundles all the javascript codes that browsers need into a single <code>.js</code> file.</p>
+<p>Browserify supports plugins, The '<a href="https://www.npmjs.com/package/coffeeify">coffeeify</a>' is one of which that allows the 'browserify' to load coffee scripts and transform them into javascript. The '<a href="https://www.npmjs.com/package/tsify">tsify</a>' is the one for typescript.</p>
+<p>Therefore, to support typescript in Unleashed.UI, we need to install '<strong>tsify</strong>' along with native typescript package. </p>
+<div class="highlight"><pre><span></span><code>npm install --save-dev typescrip tsify
+</code></pre></div>
+
+
+<p>One difference between 'tsify' and 'coffeeify' is that the 'tsify' doesn't support parameter 'transform'. So we need to <a href="https://stackoverflow.com/questions/40182786/how-to-set-up-grunt-browserify-tsify-babelify">do some hack</a> to make it work with 'coffeeify':</p>
+<div class="highlight"><pre><span></span><code><span class="nx">browserify</span><span class="o">:</span> <span class="p">{</span>
+    <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">configure</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">b</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="nx">b</span><span class="p">.</span><span class="nx">plugin</span><span class="p">(</span><span class="s1">&#39;tsify&#39;</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">},</span>
+    <span class="nx">server</span><span class="o">:</span> <span class="p">{</span>
+        <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
+            <span class="nx">transform</span><span class="o">:</span> <span class="p">[</span><span class="s1">&#39;coffeeify&#39;</span><span class="p">]</span>
+        <span class="p">},</span>
+        <span class="nx">files</span><span class="o">:</span> <span class="p">...</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<h2>AngularJS Component in Typescript</h2>
+<p>It's time to add a component in typescripts now!</p>
+<p>First of all, install "type" for angular 1:</p>
+<div class="highlight"><pre><span></span><code>npm install --save-dev @types/angular
+</code></pre></div>
+
+
+<p>Then, we add "scripts" in <code>components/typescripts/hello.compoment.ts</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="kd">class</span> <span class="nx">HelloController</span> <span class="nx">implements</span> <span class="nx">ng</span><span class="p">.</span><span class="nx">IComponentController</span> <span class="p">{</span>
+  <span class="nx">public</span> <span class="nx">message</span><span class="o">:</span> <span class="nb">String</span><span class="p">;</span>
+
+  <span class="nx">constructor</span><span class="p">()</span> <span class="p">{</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">message</span> <span class="o">=</span> <span class="sb">`Hello Typescript`</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">export</span> <span class="kd">class</span> <span class="nx">HelloOption</span> <span class="nx">implements</span> <span class="nx">ng</span><span class="p">.</span><span class="nx">IComponentOptions</span> <span class="p">{</span>
+  <span class="nx">public</span> <span class="nx">controller</span><span class="o">:</span> <span class="nx">ng</span><span class="p">.</span><span class="nx">Injectable</span><span class="o">&lt;</span><span class="nx">ng</span><span class="p">.</span><span class="nx">IControllerConstructor</span><span class="o">&gt;</span><span class="p">;</span>
+  <span class="nx">public</span> <span class="nx">controllerAs</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+  <span class="nx">public</span> <span class="nx">templateUrl</span><span class="o">:</span> <span class="nx">string</span><span class="p">;</span>
+
+  <span class="nx">constructor</span><span class="p">(){</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">controller</span> <span class="o">=</span> <span class="nx">HelloController</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">controllerAs</span> <span class="o">=</span> <span class="s1">&#39;vm&#39;</span><span class="p">;</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">templateUrl</span> <span class="o">=</span> <span class="s1">&#39;components/typescripts/hello.tpl.html&#39;</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="nx">declare</span> <span class="kd">var</span> <span class="nx">angular</span><span class="o">:</span> <span class="nx">ng</span><span class="p">.</span><span class="nx">IAngularStatic</span>
+<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;typescript&#39;</span><span class="p">,</span> <span class="p">[]).</span><span class="nx">component</span><span class="p">(</span><span class="s2">&quot;unlHello&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">HelloOption</span><span class="p">())</span>
+</code></pre></div>
+
+
+<p>In real world usage, you may want to declare all components for the same module together. So let's extract the last two lines into a seperate file. </p>
+<div class="highlight"><pre><span></span><code><span class="k">import</span> <span class="p">{</span> <span class="nx">HelloOption</span> <span class="p">}</span> <span class="nx">from</span> <span class="s2">&quot;./hello.component&quot;</span><span class="p">;</span>
+<span class="kr">declare</span> <span class="kd">var</span> <span class="nx">angular</span>: <span class="kt">ng.IAngularStatic</span>
+<span class="nx">angular</span><span class="p">.</span><span class="nx">module</span><span class="p">(</span><span class="s1">&#39;typescript&#39;</span><span class="p">,</span> <span class="p">[])</span>
+    <span class="p">.</span><span class="nx">component</span><span class="p">(</span><span class="s2">&quot;unlHello&quot;</span><span class="p">,</span> <span class="k">new</span> <span class="nx">HelloOption</span><span class="p">())</span>
+</code></pre></div>
+
+
+<p>Then, run the grunt task to transpile &amp; package:</p>
+<div class="highlight"><pre><span></span><code>grunt build
+</code></pre></div>
+
+
+<p>Now you have a new component <code>unl-hello</code> available in Unleashed web page!</p>
+<p>You may have found that we use <strong>component</strong> instead of <strong>directive</strong> here. Moving forward it would be better to use the "component" instead of the "directives". The Angular Component was introduced in Angular 1.5 and is <a href="https://angular.io/guide/upgrade#using-component-directives">recommended for upgrade to Angular 2+</a>.</p>
+<p>At last, don't forget import your module in the Angular bootstraping file <code>app.coffee</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="nx">require</span> <span class="s">&#39;./components/typescripts/typescript&#39;</span>
+</code></pre></div>
+
+
+<h2>Summary</h2>
+<p>In modern web application development, packaging is becoming more and more important. It empowers the developers to generate more productivity with less efforts. With GruntJS's help, we can code with typescript in Unleashed.UI project now.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/web.html">Web</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/web.html">web </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/way-to-typescript.html";
+        var disqus_url = "https://en.yangtalks.com/2018/way-to-typescript.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

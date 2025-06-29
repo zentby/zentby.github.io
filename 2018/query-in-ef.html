@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Query in Entity Framework</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/query-in-ef.html" rel="bookmark"
+        title="Permalink to Query in Entity Framework">Query in Entity Framework</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-03-22T21:09:00+13:00">Thu 22 March 2018
+</h6>
+
+
+    <p>With Entity Data Model, we built the connection between conceptual models and database schema. The next question would be how we’re going to code with the EDM objects.</p>
+<p>Today we’ll have a quick view to LINQ to Entities, which is the main way developing with conceptual models, as well as Entity SQL —a storage independent query language. Either way the queries would eventually be transformed to corresponding sql query to database.</p>
+<h3>LINQ to Entities</h3>
+<p>LINQ is an acronym stands for <a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/">Language-INtegrated Query</a>. It is a set of query technologies that allow you to create an unified query against different data sources. So on language level, it represents a bunch of methods to operate object sets. </p>
+<p>When LINQ applied with Entity Framework, we got three different technologies: <a href="https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/linq-and-ado-net">LINQ to DateSet, LINQ to SQL and LINQ to Entities</a>. This time we'll talk about LINQ to Entities only.</p>
+<p>LINQ to Entities supports both query syntax and method syntax of LINQ. Query syntax is similar to SQL query, writing with c#, you can compose you LINQ inline by using <em>from/where/select</em> keywords:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span> <span class="n">customers</span> <span class="p">=</span> <span class="k">from</span> <span class="n">c</span> <span class="k">in</span> <span class="n">DbContext</span><span class="p">.</span><span class="n">Set</span><span class="p">&lt;</span><span class="n">Customers</span><span class="p">&gt;()</span>
+                            <span class="k">where</span> <span class="n">c</span><span class="p">.</span><span class="n">Deleted</span> <span class="p">=</span> <span class="k">false</span>
+                            <span class="k">select</span> <span class="n">c</span><span class="p">.</span><span class="n">Id</span>
+</code></pre></div>
+
+
+<blockquote>
+<p>The reason why LINQ query starts with <code>from</code> instead of <code>select</code>, it must be for enabling IntelliSense while editing. It's happening all the time in Sql Server Management Tool that column names only get populated after you typed table name -- which always be the second line of your script.</p>
+</blockquote>
+<p>WIth method syntax, on the other hand, the code can be more straight forward:</p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span> <span class="n">customers</span> <span class="p">=</span> <span class="n">DbContext</span><span class="p">.</span><span class="n">Set</span><span class="p">&lt;</span><span class="n">Customers</span><span class="p">&gt;()</span>
+                <span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">Deleted</span> <span class="p">==</span> <span class="k">false</span><span class="p">)</span>
+                <span class="p">.</span><span class="n">Select</span><span class="p">(</span><span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">Id</span><span class="p">);</span>
+</code></pre></div>
+
+
+<p>Both methods result to a same data set in <code>customers</code> variable and both the types of the variables would  be <code>IQueryable</code>. Everyone new to LINQ to Entities must be careful with the differences between <code>IQueryable</code> and <code>IEnumerable</code>. The <code>IQueryable</code> contains metadata about the query, such as the query expression and the provider being used, and it only has result returned within the object after the query inside is executed. The easiest way to execute the query and convert a <code>IQueryable</code> to a <code>IEnumerable</code> is call <code>.ToList()</code>.</p>
+<div class="highlight"><pre><span></span><code><span class="n">customers</span><span class="p">.</span><span class="n">ToList</span><span class="p">()</span>
+</code></pre></div>
+
+
+<blockquote>
+<p>Under the cover, <code>IQueryable</code> is building an expression tree when you fill your chaining methods. The execution of the <code>IQueryable</code> varies based on different data provider. It converts the expression tree into format the provider recongnized and send it to the corresponding server. Potentially it could support all data sources, as long as there is an implementation of <code>IQueryable</code> from those providers.</p>
+</blockquote>
+<p>The expression above  would be executed on our DB server  and return the result into a <code>List&lt;T&gt;</code> object. This query can be easily monitored with <a href="https://docs.microsoft.com/en-us/sql/tools/sql-server-profiler/sql-server-profiler">SQL Server Profiler</a> if you're using MS SQL Server. It would look like:</p>
+<div class="highlight"><pre><span></span><code><span class="k">SELECT</span>
+<span class="p">[</span><span class="n">Extent1</span><span class="p">].[</span><span class="n">Id</span><span class="p">]</span> <span class="k">AS</span> <span class="p">[</span><span class="n">Id</span><span class="p">]</span>
+<span class="k">FROM</span> <span class="p">[</span><span class="n">dbo</span><span class="p">].[</span><span class="n">Customers</span><span class="p">]</span> <span class="k">AS</span> <span class="p">[</span><span class="n">Extent1</span><span class="p">]</span>
+<span class="k">WHERE</span> <span class="p">[</span><span class="n">Extent1</span><span class="p">].[</span><span class="n">Deleted</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+</code></pre></div>
+
+
+<p>It's fairly a simple SQL query that generated from our code but sometimes the queries may look more complex. We might come back and talk to its impact on performance later.</p>
+<h3>Entity SQL</h3>
+<p>What is Entity SQL? </p>
+<p>Well, Entity SQL is another query language Microsoft invented .... to consume your enthusiasms on SQL-like languages. </p>
+<p>Here's the way using Entity SQL to implement our query to get customers id:</p>
+<div class="highlight"><pre><span></span><code><span class="n">EntityCommand</span> <span class="n">cmd</span> <span class="p">=</span> <span class="n">conn</span><span class="p">.</span><span class="n">CreateCommand</span><span class="p">();</span>
+<span class="n">cmd</span><span class="p">.</span><span class="n">CommandText</span> <span class="p">=</span> <span class="s">@&quot;SELECT VALUE c.Id FROM Customers AS c WHERE c.Deleted = 0&quot;</span>
+<span class="n">EntityDataReader</span> <span class="n">reader</span> <span class="p">=</span> <span class="n">cmd</span><span class="p">.</span><span class="n">ExecuteReader</span><span class="p">(</span><span class="n">CommandBehavior</span><span class="p">.</span><span class="n">SequentialAccess</span><span class="p">)</span>
+<span class="c1">// Extract data from reader</span>
+</code></pre></div>
+
+
+<h2>Summary</h2>
+<p>In this post we talked about approaches to query database with Entity Framework. There is no doubt that my favorite one is to use LINQ chaining methods. It helps you validate in compile time so you can always focus on the business logics.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/ef.html">ef </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/query-in-ef.html";
+        var disqus_url = "https://en.yangtalks.com/2018/query-in-ef.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

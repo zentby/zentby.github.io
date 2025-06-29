@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>POCO and T4</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/poco-and-t4.html" rel="bookmark"
+        title="Permalink to POCO and T4">POCO and T4</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-05-15T21:10:00+12:00">Tue 15 May 2018
+</h6>
+
+
+    <p>It’s been a while not writing any post, I’ll try finish this series before I get tired of it. This time I’ll talk about two words - POCO and T4</p>
+<h2>What is POCO?</h2>
+<p>POCO is Plain Old CLR Object; a word from <a href="https://en.wikipedia.org/wiki/Plain_old_Java_object">POJO</a> - Plain Old Java Object - maybe, if for Lua it would be POLO, Golang is POGO, php is POPO, etc. </p>
+<p>CLR is short for Common Language Runtime. It’s a very correct definition for POCO but to be easier, just use C# instead.</p>
+<p>Plain Old - means simple, straight, no dependency whatsoever. </p>
+<p>POCO class looks like this:</p>
+<div class="highlight"><pre><span></span><code><span class="k">public</span> <span class="k">class</span> <span class="nc">Product</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Code</span> <span class="p">{</span><span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>And Non-POCO class:</p>
+<div class="highlight"><pre><span></span><code><span class="na">[EdmEntityTypeAttribute(Namespace=&quot;CMSModel&quot;, Name=&quot;Product&quot;)]</span>
+<span class="k">public</span> <span class="k">class</span> <span class="nc">Product</span><span class="p">:</span> <span class="n">EntityObject</span>
+<span class="p">{</span>
+<span class="na">    [EdmScalarPropertyAttribute(EntityKeyProperty=true)]</span>
+    <span class="k">public</span> <span class="kt">string</span> <span class="n">Code</span> <span class="p">{</span><span class="k">get</span><span class="p">;</span> <span class="k">set</span><span class="p">;}</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<h2>Why POCO is better than non-POCO?</h2>
+<p>Think of you already created a non-POCO classes that inherited or attributed with heaps of classes from EF libraries. You put all of these classes into assembly A, and you have another business project B which is dependent on A. Because you need to write logics for these classes so you also referred EF libraries in project B.</p>
+<p>Normally you don’t update EF references in A too often as it may introduce unnecessary issues. As projects increasing, the dependencies become very complicated. EF library upgrade involves more and more projects that dependent on A or B. </p>
+<p>At this point, if you have a project C and somehow it depends on A or B (closely or far away). Somehow, project C happen needs another functionality in one of EF libraries; a higher version than the one referenced by project A. Then the conflicts come up.</p>
+<p>Some time you can be aware of the conflicts and avoid them in advance. But some time you wouldn’t notice them until something is wrong.</p>
+<p>But if you use POCO at the very beginning, you won’t have these trouble as you never reference EF libraries in A or B. </p>
+<h2>What does POCO to do with Entity Framework?</h2>
+<p>CSDL defines the conceptual models, but it’s not possible to code with the XML data.</p>
+<p><img alt="csdl" src="https://en.yangtalks.com/2018/CSDL.png"></p>
+<p>To archive this, Visual Studio analyzes the CSDL data and automatically generate C# classes. (Microsoft used to love making things automatically. End-users love that but not the programmers, especially when they frequently get a blue image on their screen.) </p>
+<p>The generated classes are non-POCO classes and it would introduce issues that we mentioned earlier.</p>
+<p>With POCO classes, the models are more deliberate now. Any changes on framework or dependencies won’t effects the existing codes. </p>
+<p>The whole process used to be <code>CSDL -&gt; Auto Generating -&gt; Generated Classes</code> . EF takes CSDL as input and domain classes as output.</p>
+<p>Now the process is <code>CSDL -&gt; POCO Classes -&gt; Auto Mapping</code>. Both CSDL and POCO classes become input and EF will get them mapped at runtime.</p>
+<p>The removed <code>Auto Generating</code> later became the new Code Generation tool — T4 Template.</p>
+<h2>What is T4 Template?</h2>
+<p>T4 is short for Text Template Transformation Toolkit. It’s a template processor, similar to Razor in ASP.NET. Normal template processor render for html, and T4 also supports rendering code from code. </p>
+<p>It’s like writing code to let it auto write code. Unfortunately, it is not as fancy as it sounds like. Sometimes it introduces more troubles than what it might have saved.</p>
+<p>There are two signs to tell if use T4 or not. First, do you need to write similar code for a large amount of sources? Second, will you modify the generated code frequently(can it be overwritten safely)? Both of them are what POCO meets.</p>
+<p>Here’s an example of T4 template:</p>
+<div class="highlight"><pre><span></span><code><span class="p">&lt;</span><span class="err">#@</span> <span class="n">template</span> <span class="n">debug</span><span class="p">=</span><span class="s">&quot;false&quot;</span> <span class="n">hostspecific</span><span class="p">=</span><span class="s">&quot;true&quot;</span> <span class="n">language</span><span class="p">=</span><span class="s">&quot;C#&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="err">#@</span> <span class="n">assembly</span> <span class="n">name</span><span class="p">=</span><span class="s">&quot;System.Core&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="err">#@</span> <span class="n">import</span> <span class="n">namespace</span><span class="p">=</span><span class="s">&quot;System.Linq&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="err">#@</span> <span class="n">import</span> <span class="n">namespace</span><span class="p">=</span><span class="s">&quot;System.Text&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="err">#@</span> <span class="n">import</span> <span class="n">namespace</span><span class="p">=</span><span class="s">&quot;System.IO&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="err">#@</span> <span class="n">import</span> <span class="n">namespace</span><span class="p">=</span><span class="s">&quot;System.Collections.Generic&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="err">#@</span> <span class="n">output</span> <span class="n">extension</span><span class="p">=</span><span class="s">&quot;.cs&quot;</span> <span class="err">#</span><span class="p">&gt;</span>
+<span class="k">namespace</span> <span class="nn">T4Testing</span>
+<span class="p">{</span>
+<span class="p">&lt;</span><span class="err">#</span>
+<span class="kt">var</span> <span class="n">ttFilePath</span> <span class="p">=</span> <span class="k">this</span><span class="p">.</span><span class="n">Host</span><span class="p">.</span><span class="n">ResolvePath</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">);</span>
+<span class="kt">var</span> <span class="n">data</span> <span class="p">=</span> <span class="n">File</span><span class="p">.</span><span class="n">ReadLines</span><span class="p">(</span><span class="n">ttFilePath</span> <span class="p">+</span> <span class="s">@&quot;\data.txt&quot;</span><span class="p">);</span>
+<span class="k">foreach</span> <span class="p">(</span><span class="kt">var</span> <span class="n">line</span> <span class="k">in</span> <span class="n">data</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="err">#</span><span class="p">&gt;</span>
+    <span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="p">&lt;</span><span class="err">#</span><span class="p">=</span> <span class="n">line</span><span class="err">#</span><span class="p">&gt;</span> 
+    <span class="p">{</span>
+    <span class="c1">// Something</span>
+    <span class="p">}</span>
+<span class="p">&lt;</span><span class="err">#</span>
+<span class="p">}</span><span class="err">#</span><span class="p">&gt;</span>
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p>It reads lines from <code>data.txt</code> file and generate <code>partial</code> classes for each line.</p>
+<p><code>data.txt</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="err">    Pyramid</span>
+<span class="err">    Cube</span>
+</code></pre></div>
+
+
+<p><code>code.cs</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="k">namespace</span> <span class="nn">T4Testing</span>
+<span class="p">{</span>
+    <span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">Pyramid</span> 
+    <span class="p">{</span>
+    <span class="c1">// Something</span>
+    <span class="p">}</span>   
+    <span class="k">public</span> <span class="k">partial</span> <span class="k">class</span> <span class="nc">Cube</span> 
+    <span class="p">{</span>
+    <span class="c1">// Something</span>
+    <span class="p">}</span>   
+<span class="p">}</span>
+</code></pre></div>
+
+
+<p><strong>Frankly speaking (typing), writing a T4 template to generate code is more interesting than what it is generating.</strong> For modern IDEs like Visual Studio, with or without ReSharper, it always provides a deadly easy way to guess what you are trying to code. T4 is useful only if you need to type a large number of similar code. Even in that case, it is more likely a one-off thing that you can throw it away as soon as it has created the classes. Because the more important and difficult part for each class is business logic.</p>
+<p>Some would say that logic can also be defined in structured format like XML. It’s doable but if so you’ll need to write code to parse and convert them from XML to your T4 code. The effort and complexity is not reduced by doing so and it will even create a lot of new troubles.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/ef.html">ef </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/poco-and-t4.html";
+        var disqus_url = "https://en.yangtalks.com/2018/poco-and-t4.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

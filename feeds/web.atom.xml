@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>YangTalks - Web</title><link href="https://en.yangtalks.com/" rel="alternate"></link><link href="https://en.yangtalks.com/feeds/web.atom.xml" rel="self"></link><id>https://en.yangtalks.com/</id><updated>2018-07-13T20:30:00+12:00</updated><entry><title>Way to typescript</title><link href="https://en.yangtalks.com/2018/way-to-typescript.html" rel="alternate"></link><published>2018-07-13T20:30:00+12:00</published><updated>2018-07-13T20:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-07-13:/2018/way-to-typescript.html</id><summary type="html">&lt;p&gt;&lt;img alt="grunt-typescript" src="https://en.yangtalks.com/2018/grunt-ts.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Recently team &lt;strong&gt;BOLT&lt;/strong&gt; just upgraded the NPM packages in &lt;strong&gt;Unleashed.UI&lt;/strong&gt; project and enabled the support of Typescript in the AngularJS app.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;
+The key to support TS in Unleashed.UI is to install the required packages and integrate …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="grunt-typescript" src="https://en.yangtalks.com/2018/grunt-ts.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Recently team &lt;strong&gt;BOLT&lt;/strong&gt; just upgraded the NPM packages in &lt;strong&gt;Unleashed.UI&lt;/strong&gt; project and enabled the support of Typescript in the AngularJS app.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;
+The key to support TS in Unleashed.UI is to install the required packages and integrate with existing Grunt tasks. This article will give a quick catchup of what Grunt is and how we integrate typescript with it in Unleashed solution.&lt;/p&gt;
+&lt;h2&gt;What's Grunt&lt;/h2&gt;
+&lt;p&gt;Unleashed.UI project uses Grunt as it's packing tools. In front-end world, a packing tool is used to process your code from writting language/format to a small/compatitable/performant version for real-world browsers. &lt;/p&gt;
+&lt;p&gt;Strictly speaking, Grunt is not a packing tool. It is designed as a "&lt;strong&gt;Task Runner&lt;/strong&gt;" that techinically can run every program on the machine. It has thousands of plugins for different scenarios to use. Packing a web application is one of the most common one. &lt;/p&gt;
+&lt;h2&gt;Understand the Grunt tasks&lt;/h2&gt;
+&lt;p&gt;Let's dive into the Grunt in Unleashed repo.&lt;/p&gt;
+&lt;p&gt;The Grunt auto loads the definitions of tasks from a &lt;code&gt;Gruntfile&lt;/code&gt;. It looks for the default name &lt;code&gt;Gruntfile.js&lt;/code&gt; or &lt;code&gt;Gruntfile.coffee&lt;/code&gt; under the same folder. (Only the config supports CoffeeScript natively) 
+&lt;em&gt;The file can also be specified with option &lt;code&gt;--Gruntfile &amp;lt;filename&amp;gt;&lt;/code&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;A task can be declared in two ways. One of them is to load tasks from plugin - NPM packages.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;loadNpmTasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;grunt-contrib-clean&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The other way is to call &lt;code&gt;registerTask&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;registerTask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;clean&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;build&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;registerTask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;buildScript&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;target&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ngtemplates&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;target&lt;/span&gt; &lt;span class="o"&gt;===&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;dist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;browserify:dist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;uglify:dist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;browserify:debug&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;concat:js&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;copy:scripts&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+  &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The tasks loaded into grunt will be saved in key-value pairs. Each key represents the task name and the value is either the task option or the task implementation (function). You can run a specific task either by direct call with command &lt;code&gt;grunt &amp;lt;task name&amp;gt;&lt;/code&gt; or within another task. &lt;/p&gt;
+&lt;p&gt;In the above example, the task 'default' is defined to run task 'clean' and 'build'. The task 'buildScript' is a function that has our own implementation.&lt;/p&gt;
+&lt;h2&gt;Task Types&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Task from a grunt plugin&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can install a Grunt plugin from NPM. For example, the task 'clean' was from a plugin &lt;code&gt;grunt-contrib-clean&lt;/code&gt;. It can be installed as dev-dependencies:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm install --save-dev grunt-contrib-clean
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Afterward we can load the tasks from the plugin with &lt;code&gt;grunt.loadNpmTasks(...)&lt;/code&gt;. The usage/option usually can be found at its website, e.g. https://www.npmjs.com/package/grunt-contrib-clean. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Task to Run Multiple Tasks&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The value of the task definition is an array of string, e.g. &lt;code&gt;'default': ['clean', 'build']&lt;/code&gt;. It helps to run multiple tasks with one command. It will run the tasks in sequence.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Custom Task&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Grunt supports to register a task as a function. When run the task it will just run the function. The function also supports parameters by using colon: &lt;code&gt;buildScript:dist&lt;/code&gt; equals to &lt;code&gt;buildScript(dist)&lt;/code&gt;. In each function you can run other tasks with method &lt;code&gt;grunt.task.run&lt;/code&gt; function.&lt;/p&gt;
+&lt;h2&gt;Configurations&lt;/h2&gt;
+&lt;p&gt;The options for each task is usually passed in with the object when initialize. 
+e.g. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;initConfig&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+        &lt;span class="nx"&gt;clean&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;options&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;force&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="nx"&gt;dist&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;files&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nx"&gt;dot&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;src&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;%= config.tmp %&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;%= config.dist %&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]}]}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Task "browserify"&lt;/h2&gt;
+&lt;p&gt;The project &lt;a href="http://browserify.org/"&gt;browserify&lt;/a&gt; resolves the usage of 'require' for browsers. It bundles all the javascript codes that browsers need into a single &lt;code&gt;.js&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;Browserify supports plugins, The '&lt;a href="https://www.npmjs.com/package/coffeeify"&gt;coffeeify&lt;/a&gt;' is one of which that allows the 'browserify' to load coffee scripts and transform them into javascript. The '&lt;a href="https://www.npmjs.com/package/tsify"&gt;tsify&lt;/a&gt;' is the one for typescript.&lt;/p&gt;
+&lt;p&gt;Therefore, to support typescript in Unleashed.UI, we need to install '&lt;strong&gt;tsify&lt;/strong&gt;' along with native typescript package. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm install --save-dev typescrip tsify
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One difference between 'tsify' and 'coffeeify' is that the 'tsify' doesn't support parameter 'transform'. So we need to &lt;a href="https://stackoverflow.com/questions/40182786/how-to-set-up-grunt-browserify-tsify-babelify"&gt;do some hack&lt;/a&gt; to make it work with 'coffeeify':&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;browserify&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;options&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;configure&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;plugin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;tsify&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;options&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;coffeeify&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nx"&gt;files&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;AngularJS Component in Typescript&lt;/h2&gt;
+&lt;p&gt;It's time to add a component in typescripts now!&lt;/p&gt;
+&lt;p&gt;First of all, install "type" for angular 1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm install --save-dev @types/angular
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, we add "scripts" in &lt;code&gt;components/typescripts/hello.compoment.ts&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;HelloController&lt;/span&gt; &lt;span class="nx"&gt;implements&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IComponentController&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;String&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;message&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sb"&gt;`Hello Typescript`&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;export&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt; &lt;span class="nx"&gt;implements&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IComponentOptions&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;controller&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Injectable&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IControllerConstructor&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;controllerAs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;templateUrl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;(){&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;controller&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;HelloController&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;controllerAs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;vm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;templateUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;components/typescripts/hello.tpl.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nx"&gt;declare&lt;/span&gt; &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;angular&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IAngularStatic&lt;/span&gt;
+&lt;span class="nx"&gt;angular&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;typescript&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[]).&lt;/span&gt;&lt;span class="nx"&gt;component&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;unlHello&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In real world usage, you may want to declare all components for the same module together. So let's extract the last two lines into a seperate file. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nx"&gt;from&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;./hello.component&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kr"&gt;declare&lt;/span&gt; &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;angular&lt;/span&gt;: &lt;span class="kt"&gt;ng.IAngularStatic&lt;/span&gt;
+&lt;span class="nx"&gt;angular&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;typescript&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[])&lt;/span&gt;
+    &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;component&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;unlHello&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, run the grunt task to transpile &amp;amp; package:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;grunt build
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now you have a new component &lt;code&gt;unl-hello&lt;/code&gt; available in Unleashed web page!&lt;/p&gt;
+&lt;p&gt;You may have found that we use &lt;strong&gt;component&lt;/strong&gt; instead of &lt;strong&gt;directive&lt;/strong&gt; here. Moving forward it would be better to use the "component" instead of the "directives". The Angular Component was introduced in Angular 1.5 and is &lt;a href="https://angular.io/guide/upgrade#using-component-directives"&gt;recommended for upgrade to Angular 2+&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;At last, don't forget import your module in the Angular bootstraping file &lt;code&gt;app.coffee&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;require&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;./components/typescripts/typescript&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;In modern web application development, packaging is becoming more and more important. It empowers the developers to generate more productivity with less efforts. With GruntJS's help, we can code with typescript in Unleashed.UI project now.&lt;/p&gt;</content><category term="Web"></category><category term="web"></category></entry><entry><title>Fast Build Your App with Vue.Js</title><link href="https://en.yangtalks.com/2018/vue-js.html" rel="alternate"></link><published>2018-07-03T20:10:00+12:00</published><updated>2018-07-03T20:10:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-07-03:/2018/vue-js.html</id><summary type="html">&lt;p&gt;&lt;img alt="vuejs" src="https://en.yangtalks.com/2018/vuejs.png"&gt;&lt;/p&gt;
+&lt;p&gt;I used to refuse front end development. I knew HTML, I knew CSS, I knew Javascript, but I didn’t know how they work together. Even later I had the knowledge of jQuery, of CoffeeScript, of AngularJS, I still didn …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="vuejs" src="https://en.yangtalks.com/2018/vuejs.png"&gt;&lt;/p&gt;
+&lt;p&gt;I used to refuse front end development. I knew HTML, I knew CSS, I knew Javascript, but I didn’t know how they work together. Even later I had the knowledge of jQuery, of CoffeeScript, of AngularJS, I still didn’t know how to build an app from scratch before long. &lt;/p&gt;
+&lt;p&gt;Recently I had a look into VueJS. I tried to use it to build up a simple web application. It did a good job and then I became a fan of it. In the whole development process, I took 99% of my time on the business logic, other than maintaining the framework NPM dependencies.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What is VueJS?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Vue is another modern web front-end framework which has the similar concept of MVVM with Angular or React. Vue is targeting lightweight and progressive and it made it. You can build modern single page application without having too many libraries or build scripts or other overheads.&lt;/p&gt;
+&lt;p&gt;Comparing to Angular 1 &amp;amp; 2, I have to say Vue.Js is far more friendly and easy to individual developers. It would be the best framework to start a small project or prototype an idea. &lt;/p&gt;
+&lt;p&gt;When I started the learning guide, I spent less than 1 hour to have an idea of how it makes the view model works. Then I started building an app. Vue simplifies the communications between HTML and JS. It fixed the biggest pain point of web development.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Hello World&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As one line of code is worth a thousand words, let’s have a look at the Vue’s Hello World:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;script&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://vuejs.org/js/vue.js&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;app&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;message&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+var app = new Vue({
+  el: &amp;#39;#app&amp;#39;,
+  data: {
+    message: &amp;#39;Hello Vue!&amp;#39;
+  }}) 
+&lt;span class="nt"&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;div&lt;/code&gt; in Html defines the container of the Vue app. The instance of &lt;code&gt;Vue&lt;/code&gt; declares the view-model of the app. By giving value to the view-model, the UI (html) gets updated accordingly.&lt;/p&gt;
+&lt;p&gt;Pretty simple, right? If you like, you can open Chrome DevTools and update the view-model’s value in the console.
+    app.message = "Hey Vue"&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Highlights&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I’ll skip copying the simple guide from its &lt;a href="https://vuejs.org/v2/guide/"&gt;website&lt;/a&gt;. But I’ll give some highlights here.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a href="https://vuejs.org/v2/guide/single-file-components.html"&gt;Single File Component&lt;/a&gt;&lt;/strong&gt;. 
+Single File Component means to compose HTML (template), Javascript (code) and CSS (styling) for one component into one file (&lt;code&gt;.vue&lt;/code&gt; file). Each &lt;code&gt;.vue&lt;/code&gt; file is a highly cohesive component. In addition, you won’t have to mess your project folder with a huge amount of files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="Single File Component" src="https://en.yangtalks.com/2018/SFC.png"&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href="https://cli.vuejs.org/guide/prototyping.html"&gt;Instant Prototyping&lt;/a&gt;&lt;/strong&gt;. 
+With a &lt;code&gt;.vue&lt;/code&gt; file, you can start your new app in no time by using the &lt;code&gt;vue-cli&lt;/code&gt; tools. It auto downloads required references, build and trim, then output as a minified &lt;code&gt;html&lt;/code&gt; and &lt;code&gt;js&lt;/code&gt; files. You can choose either integrate the outputs with your existing project or put them on a web server as a static website. No pains about configurations. &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Vue DevTools&lt;/strong&gt;. 
+Install the &lt;a href="https://github.com/vuejs/vue-devtools"&gt;dev tools&lt;/a&gt; extension in your Chrome. Then every time you load a Vue app, you would be able to view the virtual structure of the app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="devtools" src="https://en.yangtalks.com/2018/vue-devtool.png"&gt;&lt;/p&gt;
+&lt;p&gt;For those of you who are interested in the differences between Vue and Angular and React. Take a look at the full list &lt;a href="https://vuejs.org/v2/guide/comparison.html"&gt;here&lt;/a&gt;. It is highly recommended to read this. Not only for the difference but also for the key features of each framework.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PS&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I still remember how frustrated I was last year when I first time learned Angular 2. &lt;/p&gt;
+&lt;p&gt;Initially, I struggled from the bunch of &lt;code&gt;ng&lt;/code&gt; commands from its own &lt;code&gt;ng-cli&lt;/code&gt;. I had to carefully call the methods without knowing much what actually happened behind the scenes. Once a very trivial error happened I need to either started over again or spent heaps of time to google the solution. &lt;/p&gt;
+&lt;p&gt;Angular is using Typescript by default. So it became another overhead to get used to the syntax, as well we figure out how to transcompile to javascript.&lt;/p&gt;
+&lt;p&gt;On the other side, if you develop with Vue, you don’t need to worry about them at all. Write a &lt;code&gt;.vue&lt;/code&gt; file, and run with &lt;code&gt;vue-cli&lt;/code&gt;. That’s it! Starting a web app has never been so easy!&lt;/p&gt;</content><category term="Web"></category><category term="ef"></category></entry></feed>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8" />
+    <!-- Set the viewport width to device width for mobile -->
+    <meta name="viewport" content="width=device-width" />
+
+    <title>Entity Object Tracking</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/normalize.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/foundation.min.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/style.css" />
+    <link rel="stylesheet" href="https://en.yangtalks.com/theme/css/pygments.css" />	
+    <script src="https://en.yangtalks.com/theme/js/modernizr.js"></script>
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-84962714-5']);
+    _gaq.push(['_trackPageview']);
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+    </script>
+</head>
+
+<body>
+
+<!-- Nav Bar -->
+<nav>
+<div class="top-bar">
+<div class="row">
+    <div class="large-9 large-centered columns">
+	    <h1><a href="https://en.yangtalks.com">Yang Talks</a></h1>
+    </div>
+</div>
+</div>
+
+<!-- Show menu items and pages -->
+<div class="row">
+<div class="large-9 columns">
+    <ul class="button-group navigation">
+
+    </ul>
+</div>
+</div>
+</nav>
+<!-- End Nav -->
+
+
+<!-- Main Page Content and Sidebar -->
+<div class="row">
+
+    <!-- Sidebar -->
+    <aside class="large-3 columns">
+        <h5 class="sidebar-title">Site</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/archives.html">Archives</a>
+            <li><a href="https://en.yangtalks.com/" rel="alternate">Atom feed</a></li>
+            <li><a href="https://en.yangtalks.com/feeds/all.rss.xml" rel="alternate">RSS feed</a></li>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Categories</h5>
+        <ul class="side-nav">
+            <li><a href="https://en.yangtalks.com/category/blog.html">Blog</a></li>
+            <li><a href="https://en.yangtalks.com/category/container.html">Container</a></li>
+            <li><a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a></li>
+            <li><a href="https://en.yangtalks.com/category/go.html">Go</a></li>
+            <li><a href="https://en.yangtalks.com/category/serverless.html">Serverless</a></li>
+            <li><a href="https://en.yangtalks.com/category/web.html">Web</a></li>
+   
+        </ul>
+
+		
+        <h5 class="sidebar-title">Tags</h5>
+        <ul class="side-nav">
+            <p><a href="https://en.yangtalks.com/tag/aws.html">aws<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/code.html">code<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/container.html">container<span> (4)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/docker.html">docker<span> (5)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/dotnetcore.html">dotnetcore<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/ef.html">ef<span> (7)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/golang.html">golang<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/serverless.html">serverless<span> (1)</span></a></p>
+            <p><a href="https://en.yangtalks.com/tag/web.html">web<span> (1)</span></a></p>
+        </ul>
+
+		
+        <h5 class="sidebar-title">Social</h5>
+        <ul class="side-nav">
+            <li><a href="https://www.linkedin.com/in/zentby/"><i class="fab fa-linkedin"></i> &nbsp;linkedin</a></li>
+            <li><a href="https://github.com/zentby"><i class="fab fa-github"></i> &nbsp;github</a></li>
+            <li><a href="mailto:yangzhaonz+yangtalks@gmail.com"><i class="far fa-envelope"></i> &nbsp;email</a></li>
+        </ul>
+
+    </aside> <!-- End Sidebar -->
+
+    <!-- Main Blog Content -->
+    <div class="large-9 columns">
+<article>
+    <header>
+        <h3 class="article-title"><a href="https://en.yangtalks.com/2018/entity-object-tracking.html" rel="bookmark"
+        title="Permalink to Entity Object Tracking">Entity Object Tracking</a></h3>
+    </header>
+
+<h6 class="subheader" title="2018-04-04T21:09:00+12:00">Wed 04 April 2018
+</h6>
+
+
+    <p><strong>Object State</strong></p>
+<p>Last time we introduced how to query database from conceptual models. It includes LINQ to Entities and Entity SQL. With <code>IQueryable</code> object, the sql script will be built and executed automatically within the method <code>.ToList()</code>. After the data is loaded in our program, we'll operate against them and save changes back to the database. Today we'll talk about how Entity Framework manage the changes in our program.</p>
+<p>When the query executes through <code>ObjectContext</code> and is materialized into objects, Entity Framework takes a snapshot of an entity’s values. The context stores two set of values of the entity. One of them is the original values of the object and it remains static. The other one will be a realtime values that being modified in the program. The object that saved the two set of values is named <code>ObjectStateEntry</code>. Every object returned from database will have an instance of <code>ObjectStateEntry</code> as a shadow.</p>
+<p>Each <code>ObjectStateEntry</code> has a property <code>State</code> to reflect the state of the entity(<code>Unchanged</code>, <code>Modified</code>, <code>Added</code> or <code>Deleted</code>). As the user modifies the objects, the <code>ObjectContext</code> updates  the  current  values  of  the  related  <code>ObjectStateEntry</code>  as  well  as  its <code>State</code></p>
+<p>The entity object  itself  also has an <code>EntityState</code> property, which it inherits from <code>EntityObject</code>. As long as the object is being managed by the context, its <code>EntityState</code> will always match the <code>State</code> of the <code>ObjectStateEntry</code>. If the object is not being managed by the context, there is no <code>ObjectStateEntry</code> and the entity’s <code>State</code> is <code>Detached</code>.</p>
+<p><strong>Save Changes</strong></p>
+<p>After finish modifying conceptual objects that loaded from context, we could easily get these changes applied to database by call the method of <code>SaveChanges</code> against the context. And by doing that all the SQL scripts will be automatically generated and executed.</p>
+<p>When the context was notified of a property change, not only did it modify the current value in the <code>ObjectStateEntry</code>, but it also set another tracking value that indicates that the property was changed. During <code>SaveChanges</code>, the context then looks for those tracking values to determine which fields were changed.</p>
+<div class="highlight"><pre><span></span><code><span class="kt">var</span> <span class="n">customer</span> <span class="p">=</span> <span class="n">context</span><span class="p">.</span><span class="n">Customers</span><span class="p">.</span><span class="n">FirstOrDefault</span><span class="p">.</span><span class="n">Where</span><span class="p">(</span><span class="n">c</span> <span class="p">=&gt;</span> <span class="n">c</span><span class="p">.</span><span class="n">Name</span> <span class="p">==</span> <span class="s">&quot;Jason&quot;</span><span class="p">);</span>
+<span class="n">customer</span><span class="p">.</span><span class="n">IsObsolete</span> <span class="p">=</span> <span class="k">true</span><span class="p">;</span>
+<span class="n">context</span><span class="p">.</span><span class="n">SaveChanges</span><span class="p">();</span>
+</code></pre></div>
+
+
+<p>WIth SQL Profiler, we'll get the executing sql:</p>
+<div class="highlight"><pre><span></span><code><span class="n">exec</span> <span class="n">sp_executesql</span> <span class="n">N</span><span class="err">&#39;</span><span class="n">update</span> <span class="p">[</span><span class="n">dbo</span><span class="p">].[</span><span class="n">Customers</span><span class="p">]</span>
+<span class="n">set</span> <span class="p">[</span><span class="n">IsObsolete</span><span class="p">]</span> <span class="o">=</span> <span class="mi">@0</span>
+<span class="n">where</span> <span class="p">([</span><span class="n">Name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">@1</span><span class="p">)</span><span class="err">&#39;</span>
+<span class="p">,</span><span class="n">N</span><span class="err">&#39;</span><span class="mi">@0</span> <span class="n">bit</span><span class="p">,</span><span class="mi">@1</span> <span class="n">nvarchar</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span><span class="err">&#39;</span>
+<span class="p">,</span><span class="mi">@0</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="mi">@1</span><span class="o">=</span><span class="err">&#39;</span><span class="n">Jason</span><span class="err">&#39;</span>
+</code></pre></div>
+
+
+<p><strong>No Tracking</strong></p>
+<p>No tracking query, as the name suggest, means the objects that returned by the query would not be managed by the context. Though it relates to what is called <code>MergeOption</code> for querying, which controls how to deal with result with existing cached objects in context (queried in the same transaction).</p>
+<p>When querying with <code>NoTracking</code> option, it does not only means the <code>SaveChanges</code> will not save any changes on those objects, but also means all the <code>ObjectStateEntry</code> objects creation will be skipped by Entity Framework. Based on these two features, <code>NoTracking</code> is often used for readonly data querying and it improves the performance significantly for large volume of data.</p>
+<p class="subheader">Category: <a href="https://en.yangtalks.com/category/entityframework.html">EntityFramework</a>
+</p>
+
+    <p class="subheader">Tagged: 
+    <a href="https://en.yangtalks.com/tag/ef.html">ef </a>
+    </p>
+
+
+
+
+	<h4>Comments</h4>
+    <div id="disqus_thread"></div>
+    <script type="text/javascript">
+        var disqus_shortname = 'yangtalks'
+        var disqus_identifier = "2018/entity-object-tracking.html";
+        var disqus_url = "https://en.yangtalks.com/2018/entity-object-tracking.html";
+
+        (function() {
+            var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+            dsq.src = 'https://' + disqus_shortname + '.disqus.com/embed.js';
+            (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+        })();
+    </script>
+    <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</article>
+    </div>
+    <!-- End Main Content -->
+
+</div> <!-- End Main Content and Sidebar -->
+
+
+<!-- Footer -->
+<footer class="row">
+    <div class="large-12 columns">
+        <hr />
+        <div class="row">
+            <div class="large-6 columns">
+                <p><i><a href="/">YangTalks</a></i> ©Copyright 2015 ~ 2020</p>
+            </div>
+            </div>
+    </div>
+</footer>
+</body>
+</html>

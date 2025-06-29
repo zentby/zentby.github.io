@@ -1,0 +1,807 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>YangTalks</title><link href="https://en.yangtalks.com/" rel="alternate"></link><link href="https://en.yangtalks.com/feeds/all.atom.xml" rel="self"></link><id>https://en.yangtalks.com/</id><updated>2020-07-12T21:30:00+12:00</updated><entry><title>Step by step starting serverless asp.net</title><link href="https://en.yangtalks.com/2020/dotnet-lambda-serverless.html" rel="alternate"></link><published>2020-07-12T21:30:00+12:00</published><updated>2020-07-12T21:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2020-07-12:/2020/dotnet-lambda-serverless.html</id><summary type="html">&lt;p&gt;The CSOD "Spring" Hackathon was held last week. My team spent a whole day to help me finish an ambitious idea. Though we didn't win the competition in the end, we had a lot of fun and did learn many …&lt;/p&gt;</summary><content type="html">&lt;p&gt;The CSOD "Spring" Hackathon was held last week. My team spent a whole day to help me finish an ambitious idea. Though we didn't win the competition in the end, we had a lot of fun and did learn many things.&lt;/p&gt;
+&lt;p&gt;The AWS lambda serverless with dotnetcore, one of "new" technologies that we used during the event, surprised me with its simplicity and dev-friendliness. It's something could be used for a very quick prototyping in the future. &lt;/p&gt;
+&lt;p&gt;Here's how we built up a &lt;strong&gt;production ready&lt;/strong&gt; REST backend in a few easy steps.&lt;/p&gt;
+&lt;p&gt;Before start, we decided our backend stack as &lt;em&gt;asp.net core&lt;/em&gt; + &lt;em&gt;MySql&lt;/em&gt;. The asp.net core will be transformed to &lt;em&gt;api gateway + lambda&lt;/em&gt;, while the MySql will be replaced by the &lt;em&gt;Aurora Serverless&lt;/em&gt;. A pure serverless architecture.&lt;/p&gt;
+&lt;p&gt;First of all, we need to get a local MySQL up and running. It can be easily accomplished by a &lt;code&gt;docker-compose&lt;/code&gt;, nice and clean:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;3.3&amp;#39;&lt;/span&gt;
+
+&lt;span class="nt"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+
+  &lt;span class="nt"&gt;db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;mysql&lt;/span&gt;
+    &lt;span class="nt"&gt;command&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;--default-authentication-plugin=mysql_native_password&lt;/span&gt;
+    &lt;span class="nt"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;always&lt;/span&gt;
+    &lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;3306:3306&amp;#39;&lt;/span&gt;
+    &lt;span class="nt"&gt;environment&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_DATABASE&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;db&amp;#39;&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_USER&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;user&amp;#39;&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_PASSWORD&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;password&amp;#39;&lt;/span&gt;
+      &lt;span class="nt"&gt;MYSQL_ROOT_PASSWORD&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;password&amp;#39;&lt;/span&gt;
+    &lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;my-db:/var/lib/mysql&lt;/span&gt;
+
+  &lt;span class="nt"&gt;adminer&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+    &lt;span class="nt"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;adminer&lt;/span&gt;
+    &lt;span class="nt"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;always&lt;/span&gt;
+    &lt;span class="nt"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+      &lt;span class="p p-Indicator"&gt;-&lt;/span&gt; &lt;span class="l l-Scalar l-Scalar-Plain"&gt;8080:8080&lt;/span&gt;
+&lt;span class="nt"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+  &lt;span class="nt"&gt;my-db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Second step, scaffolding the asp.net serverless project. Amazon engineering team provided &lt;a href="https://github.com/aws/aws-extensions-for-dotnet-cli#aws-lambda-amazonlambdatools"&gt;a set of tools integrated with dotnet-cli&lt;/a&gt;, which contains a few of serverless templates. &lt;/p&gt;
+&lt;h3&gt;1) Install global tools set&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet tool install -g Amazon.Lambda.Tools
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;2) Install project templates&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet new -i &lt;span class="s2"&gt;&amp;quot;Amazon.Lambda.Templates::*&amp;quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To view the installed lambda templates, run&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet new lambda --list
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h3&gt;3) Create new project with serverless template&lt;/h3&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet new serverless.AspNetCoreWebAPI -n serverless
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will create a folder of &lt;code&gt;example&lt;/code&gt; with the structure&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;example
+├── src
+│   └── serverless
+│       ├── Controllers
+│       │   ├── S3ProxyController.cs
+│       │   └── ValuesController.cs
+│       ├── LambdaEntryPoint.cs
+│       ├── LocalEntryPoint.cs
+│       ├── Readme.md
+│       ├── Startup.cs
+│       ├── appsettings.Development.json
+│       ├── appsettings.json
+│       ├── aws-lambda-tools-defaults.json
+│       ├── serverless.csproj
+│       └── serverless.template
+└── test/*        &lt;span class="c1"&gt;# test projects folder&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The files are almost minimal to develop and deploy the application. Let's quickly walk though the key files&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;aws-lambda-tools-defaults.json&lt;/code&gt;: Used for &lt;code&gt;dotnet lambda&lt;/code&gt; cli command. It defines the necessary deployment parameters.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;serverless.template&lt;/code&gt;: CloudFormation template that defines the resources to be created in the deployment. By default, it already includes a lambda definition with &lt;code&gt;proxy+&lt;/code&gt; API Gateway trigger.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LambdaEntryPoint.cs&lt;/code&gt;: The class wrapped with built-in &lt;code&gt;APIGatewayProxyFunction&lt;/code&gt; to enable lambda hosting the web app.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;LocalEntryPoint.cs&lt;/code&gt;: Local asp.net hosting entrance that uses Kestrel.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;Startup.cs&lt;/code&gt;: Where all the configurations and warmup happen for both local and lambda.&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;S3ProxyController.cs&lt;/code&gt;: A sample controller with AWS s3 client, where we can start to build our app straightforward.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;4) Integrate with EF core&lt;/h3&gt;
+&lt;p&gt;As part of dotnetcore family, Entity Framework Core could be easily integrated within an asp.net project.&lt;/p&gt;
+&lt;p&gt;There is also a dotnet-cli tools set for EF core. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet tool install --global dotnet-ef
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The cli sets provides a few useful commands to manage DbContext and DbMigrations. For more information, refer to &lt;a href="https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet"&gt;here&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To add MySql, you need to install another package via &lt;code&gt;dotnet package add&lt;/code&gt; command. The full provider plugins could be found &lt;a href="https://docs.microsoft.com/en-us/ef/core/providers/?tabs=dotnet-core-cli"&gt;here&lt;/a&gt;. We used the &lt;a href="https://github.com/PomeloFoundation/Pomelo.EntityFrameworkCore.MySql"&gt;Pomelo.EntityFrameworkCore.MySql&lt;/a&gt; for our project.&lt;/p&gt;
+&lt;p&gt;Once it's connected, put the &lt;code&gt;ConnectionString&lt;/code&gt; into an config file or environment variable. Then goto AWS RDS console, create an Aurora Serverless database and get the connection link. Put the link into your production configuration.&lt;/p&gt;
+&lt;h3&gt;5) Development and deployment&lt;/h3&gt;
+&lt;p&gt;To start coding, we just need to code as our normal asp.net project. Open the project with your favorite IDE.&lt;/p&gt;
+&lt;p&gt;To deploy your project, just get your AWS api key setup locally and run command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;dotnet lambda deploy-serverless
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will automatically load settings in &lt;code&gt;aws-lambda-tools-defaults.json&lt;/code&gt; (if not, then prompt to ask for input).&lt;/p&gt;
+&lt;p&gt;At the end of deployment, you'll get an API url:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;Output Name                    Value
+------------------------------ --------------------------------------------------
+ApiURL                         https://xxxxxxxx.execute-api.us-west-2.amazonaws.com/Prod/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Till now, our backend project is ready for client consuming. &lt;/p&gt;</content><category term="Serverless"></category><category term="aws"></category><category term="serverless"></category><category term="dotnetcore"></category></entry><entry><title>Building Docker Image</title><link href="https://en.yangtalks.com/2018/dockerfile.html" rel="alternate"></link><published>2018-09-08T21:30:00+12:00</published><updated>2018-09-08T21:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-09-08:/2018/dockerfile.html</id><summary type="html">&lt;h2&gt;Dockerfile&lt;/h2&gt;
+&lt;p&gt;Docker images are built from layered containers. The &lt;code&gt;Dockerfile&lt;/code&gt; is a tool that lets you define reproducable docker image.&lt;/p&gt;
+&lt;p&gt;Generally, we are doing a few things inside a Dockerfile to define an image:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Basic Running Environment&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Is your …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Dockerfile&lt;/h2&gt;
+&lt;p&gt;Docker images are built from layered containers. The &lt;code&gt;Dockerfile&lt;/code&gt; is a tool that lets you define reproducable docker image.&lt;/p&gt;
+&lt;p&gt;Generally, we are doing a few things inside a Dockerfile to define an image:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. Basic Running Environment&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Is your app running on Linux or Windows? Which version do you prefer? &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. Dependent Packages&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;What else packages does your app need? e.g. npm/nuget packages&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. Copy Application&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Copy the generated binary files into the image.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4. Set up interfaces&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Expose the port you want to listen, mounting point you want to monitor, etc.&lt;/p&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;Here is a simple proxy server that I'd like to move it into the container.&lt;/p&gt;
+&lt;p&gt;The App is simple HTTP proxy that attach CORS header for each request to a specific server. (Useful when you can't/don't want to update the API server)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;httpProxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;require&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;http-proxy&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;proxy&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;httpProxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;({});&lt;/span&gt;
+&lt;span class="nx"&gt;proxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;on&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;proxyRes&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;proxyRes&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;req&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;res&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="nx"&gt;proxyRes&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;headers&lt;/span&gt;&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;Access-Control-Allow-Origin&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;*&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;server&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;http&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;createServer&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kd"&gt;function&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;req&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;res&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="nx"&gt;proxy&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;web&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;req&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;res&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="nx"&gt;target&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;process&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;env&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;TARGET_URL&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;});&lt;/span&gt;
+&lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;listen&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mf"&gt;80&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The code structure is like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;app
+├── index.js
+├── node_modules
+└── package.json
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now let's build an image for it.&lt;/p&gt;
+&lt;p&gt;Firstly, choose to use "Alpine Linux" as its the smallest Linux (5MB)&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="s"&gt;alpine&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then install NodeJS and NPM.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;RUN&lt;/span&gt; apk update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk upgrade &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk add --update --no-cache nodejs npm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now we can copy our source code into the image.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;COPY&lt;/span&gt; proxy /proxy
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To save the time after the container starts, we should use NPM-installed image.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;RUN&lt;/span&gt; npm install
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Lastly, make the Node command as our image entry point. Don't forget to expose port 80 so our app can listen to it.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;EXPOSE&lt;/span&gt;&lt;span class="s"&gt; 80&lt;/span&gt;
+&lt;span class="k"&gt;ENTRYPOINT&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/bin/sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;node /proxy/index.js&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now let's get them together to see how a Dockerfile looks like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="s"&gt;alpine&lt;/span&gt;
+&lt;span class="k"&gt;RUN&lt;/span&gt; apk update &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk upgrade &lt;span class="o"&gt;&amp;amp;&amp;amp;&lt;/span&gt; apk add --update --no-cache nodejs npm
+&lt;span class="k"&gt;COPY&lt;/span&gt; proxy /proxy
+&lt;span class="k"&gt;RUN&lt;/span&gt; npm install
+&lt;span class="k"&gt;EXPOSE&lt;/span&gt;&lt;span class="s"&gt; 80&lt;/span&gt;
+&lt;span class="k"&gt;ENTRYPOINT&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;/bin/sh&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;-c&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;node /proxy/index.js&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>Running App in Docker (2)</title><link href="https://en.yangtalks.com/2018/docker-compose.html" rel="alternate"></link><published>2018-09-08T20:30:00+12:00</published><updated>2018-09-08T20:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-09-08:/2018/docker-compose.html</id><summary type="html">&lt;h2&gt;Docker Compose&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt; can be tedious sometimes if you have a lot of parameters to pass in or you need to re-run the container multiple times.&lt;/p&gt;
+&lt;p&gt;Docker Compose is a tool that can help you run the commands via …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Docker Compose&lt;/h2&gt;
+&lt;p&gt;&lt;code&gt;docker run&lt;/code&gt; can be tedious sometimes if you have a lot of parameters to pass in or you need to re-run the container multiple times.&lt;/p&gt;
+&lt;p&gt;Docker Compose is a tool that can help you run the commands via the definition in a &lt;code&gt;yml&lt;/code&gt; file. We call the &lt;code&gt;.yml&lt;/code&gt; file as "docker-compose file".&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;YAML is a human friendly data serialization standard for all programming languages.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;Our example in &lt;a href="https://en.yangtalks.com/2018/docker-run.html"&gt;last post&lt;/a&gt; can fit into a "docker-compose" file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="c"&gt;version: &amp;#39;3&amp;#39;&lt;/span&gt;
+&lt;span class="c"&gt;services:&lt;/span&gt;
+&lt;span class="c"&gt;rabbit-mq:&lt;/span&gt;
+&lt;span class="c"&gt;image: rabbitmq:management-alpine&lt;/span&gt;
+&lt;span class="c"&gt;container_name: dev-rabbitmq&lt;/span&gt;
+&lt;span class="c"&gt;restart: always&lt;/span&gt;
+&lt;span class="c"&gt;ports:&lt;/span&gt;
+&lt;span class="err"&gt;- 15672:15672&lt;/span&gt;
+&lt;span class="err"&gt;- 5672:5672&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;You can always find a corresponding config in the file for your &lt;code&gt;docker run&lt;/code&gt; command. Then you can start your RabbitMQ with a very few command.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker-compose up -d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;More complicated, we can build serveral services together into one "docker-compose" file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;version&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;3&amp;#39;&lt;/span&gt;
+&lt;span class="n"&gt;services&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;redis&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;redis&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;alpine&lt;/span&gt;
+&lt;span class="n"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;redis&lt;/span&gt;
+&lt;span class="k"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt;
+&lt;span class="n"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;6379&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;6379&lt;/span&gt;
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; 
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;devnet&lt;/span&gt;
+
+&lt;span class="n"&gt;rabbit&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;mq&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;rabbitmq&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;management&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;alpine&lt;/span&gt;
+&lt;span class="n"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;rabbitmq&lt;/span&gt;
+&lt;span class="k"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt;
+&lt;span class="n"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;15672&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;15672&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;5672&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;5672&lt;/span&gt;
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;devnet&lt;/span&gt;
+
+&lt;span class="n"&gt;couch&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;db&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;container_name&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="o"&gt;-&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;
+&lt;span class="n"&gt;image&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;klaemo&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="n"&gt;latest&lt;/span&gt;
+&lt;span class="k"&gt;restart&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;always&lt;/span&gt;
+&lt;span class="n"&gt;volumes&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;local&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;etc&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;local&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;d&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;data&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;opt&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="n"&gt;couchdb&lt;/span&gt;&lt;span class="o"&gt;/&lt;/span&gt;&lt;span class="k"&gt;data&lt;/span&gt;
+&lt;span class="n"&gt;ports&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="mi"&gt;5984&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;&lt;span class="mi"&gt;5984&lt;/span&gt;
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="o"&gt;-&lt;/span&gt; &lt;span class="n"&gt;devnet&lt;/span&gt;
+
+&lt;span class="n"&gt;networks&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;span class="n"&gt;devnet&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In the above docker-compose file, it also defines a "network" for the containers so that those containers are isolated from other containers.&lt;/p&gt;
+&lt;p&gt;Save the configs into a text file named &lt;code&gt;docker-compose.yml&lt;/code&gt;. Then you can start all the containers together via the command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker-compose up --detach
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It will auto load the &lt;code&gt;docker-compose.yml&lt;/code&gt; file and start the containers for you. You can also use parameter &lt;code&gt;-f&lt;/code&gt; to specify a docker-compose file:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker-compose up &lt;span class="se"&gt;\&lt;/span&gt;
+-f docker-compose.yml &lt;span class="se"&gt;\&lt;/span&gt;
+-d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>Running App in Docker (1)</title><link href="https://en.yangtalks.com/2018/docker-run.html" rel="alternate"></link><published>2018-09-08T19:30:00+12:00</published><updated>2018-09-08T19:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-09-08:/2018/docker-run.html</id><summary type="html">&lt;h2&gt;Docker Run&lt;/h2&gt;
+&lt;p&gt;When you are likely to run a container on your own machine, you need two steps.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Find the image repository and a proper tag.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;docker run&lt;/code&gt; to set container runtime parameters and then start.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;We'd like …&lt;/p&gt;</summary><content type="html">&lt;h2&gt;Docker Run&lt;/h2&gt;
+&lt;p&gt;When you are likely to run a container on your own machine, you need two steps.&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Find the image repository and a proper tag.&lt;/li&gt;
+&lt;li&gt;Use &lt;code&gt;docker run&lt;/code&gt; to set container runtime parameters and then start.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3&gt;Example&lt;/h3&gt;
+&lt;p&gt;We'd like to run a RabbitMQ on your local machine. First, we choose an image from the &lt;a href="https://hub.docker.com/_/rabbitmq/"&gt;official repository&lt;/a&gt;. E.g. we choose &lt;code&gt;rabbitmq:management-alpine&lt;/code&gt;. So we got the basic command:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker run rabbitmq:management-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;To add port forwarding to the container, we need to specify the &lt;code&gt;-p&lt;/code&gt; parameter:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker run &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;5672&lt;/span&gt;:5672 &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;15672&lt;/span&gt;:15672 &lt;span class="se"&gt;\&lt;/span&gt;
+rabbitmq:management-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It replace our host port &lt;code&gt;5672&lt;/code&gt; and &lt;code&gt;15672&lt;/code&gt; with the container's.&lt;/p&gt;
+&lt;p&gt;After that, we'd like to give a reasonable name to the container and ask the container auto start after my docker daemon is restarted. So I need to add command &lt;code&gt;--name&lt;/code&gt; and &lt;code&gt;--restart&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;$ docker run &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;5672&lt;/span&gt;:5672 &lt;span class="se"&gt;\&lt;/span&gt;
+-p &lt;span class="m"&gt;15672&lt;/span&gt;:15672 &lt;span class="se"&gt;\&lt;/span&gt;
+--name dev-rabbitmq &lt;span class="se"&gt;\&lt;/span&gt;
+--restart always &lt;span class="se"&gt;\&lt;/span&gt;
+-d &lt;span class="se"&gt;\&lt;/span&gt;
+rabbitmq:management-alpine
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And don't forget the &lt;code&gt;-d&lt;/code&gt; if you don't want to attach the container STDIN/STDOUT.&lt;/p&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>1998 ~ 2018 -- from Server to Container</title><link href="https://en.yangtalks.com/2018/docker-2.html" rel="alternate"></link><published>2018-08-10T20:30:00+12:00</published><updated>2018-08-10T20:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-08-10:/2018/docker-2.html</id><summary type="html">&lt;p&gt;&lt;em&gt;A recap from an internal sharing session&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The technology develops in two ways, improving with the existing one and taking a breaking through.&lt;/p&gt;
+&lt;p&gt;20 years ago, in the year of 1998, the servers were running on physical servers. There is …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;em&gt;A recap from an internal sharing session&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The technology develops in two ways, improving with the existing one and taking a breaking through.&lt;/p&gt;
+&lt;p&gt;20 years ago, in the year of 1998, the servers were running on physical servers. There is very few things we can do to recover from a disaster. A common approach is to have one or more mirror servers standby regardless if they are needed. Once one of the server is down, the alternative servers can save you a little time to recover.&lt;/p&gt;
+&lt;p&gt;The downside with this server generation, one is that it is very difficult to determine how many servers need to preserve for your uncertain traffic. Another one is that you have to run a lot more servers than you need if you have multiple services deployed separately.&lt;/p&gt;
+&lt;p&gt;10 years ago, in year of 2008, virtualization technology was getting very mature for production using. Multiple virtual machine can be running simultaneously on one physical server. The virtual machine supports backup to a snapshot and restore from it. So if needed, we can easily create a copy of our server and scale up on demands.&lt;/p&gt;
+&lt;p&gt;Speaking of virtual machine, I have to mention AWS EC2 service. EC2 is short for Elastic Compute Cloud. It is an online virtual machine service that provided by Amazon. Based on different scenarios, the users can run various numbers of EC2 instances with different specs. &lt;/p&gt;
+&lt;p&gt;The users also can choose to create an Amazon Machine Image from a running EC2 instance. An AMI is a snapshot of a virtual machine. The user can reuse their own AMI or share their AMI with other users or public. With the flexibility from EC2 and AMI, the applications that deployed on AWS can be easily maintained or scaled.&lt;/p&gt;
+&lt;p&gt;One of the biggest advantage of virtual machine is isolation. The software running in the guest OS is fully isolated from the host OS and other virtual machines. The isolation makes sure the application in each VM is running safely and independently. &lt;/p&gt;
+&lt;p&gt;The flaw of VM is very obvious as well. The target application needs to be running in a guest operating system that based on a set of virtualized hardwares. The computing resources can be wasted heavily on those overheads.&lt;/p&gt;
+&lt;p&gt;A practical improvement in virtualization is to replace the host OS with hypervisor, which is a specific software that manage virtual machines on top of the hardwares. In this case, we can save some overhead from the host OS.&lt;/p&gt;
+&lt;p&gt;So is there any technology that is able to adopt the highly isolated environment as well as efficiency? &lt;/p&gt;
+&lt;p&gt;Yes, it's container.&lt;/p&gt;
+&lt;p&gt;Containerization includes two key technologies. One of them is &lt;strong&gt;Linux Namespace&lt;/strong&gt;. Linux Namespace helps provide an isolated environment (including process management, users, etc.) for process to run. The other one is &lt;strong&gt;cgroups&lt;/strong&gt;, which is designed to isolate and control resources that process is using. With these technologies, even your application is still running in the host OS, they (the app) will think themselves as running in a full OS.&lt;/p&gt;
+&lt;p&gt;As we can see, the environment of the process is isolated from the current operating system. In this case, we don’t need to virtualize the hardware and the guest OS anymore. The hardware resources are getting well utilized.&lt;/p&gt;
+&lt;p&gt;So far, we haven't mentioned anything about docker. Simply because the key technology of containerization has nothing to do with docker. Docker wrapped the dirty jobs for us so we can create container easier. (For anyone interested can refer &lt;a href="https://ericchiang.github.io/post/containers-from-scratch/"&gt;this article&lt;/a&gt; to build a container without Docker)&lt;/p&gt;
+&lt;h2&gt;Q&amp;amp;A&lt;/h2&gt;
+&lt;p&gt;&lt;strong&gt;1. When we run a container of 'Ubuntu', is it running a real Ubuntu in my host machine or not?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Yes it will be a ‘Ubuntu’ but share the kernel with the host. The Ubuntu image will provide everything except Linux kernel. If your application needs a different kernel version than your host (which is very rare), you’ll need a VM for your app then.&lt;/p&gt;
+&lt;p&gt;I found a blog explaining more around kernel space and user space (&lt;a href="https://rhelblog.redhat.com/2015/07/29/architecting-containers-part-1-user-space-vs-kernel-space/"&gt;part 1&lt;/a&gt;, &lt;a href="https://rhelblog.redhat.com/2015/09/17/architecting-containers-part-2-why-the-user-space-matters-2/"&gt;part 2&lt;/a&gt;).  And the &lt;a href="https://hub.docker.com/_/ubuntu/"&gt;Ubuntu image’s Dockerfile&lt;/a&gt; also explains how it is built.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;2. How do the images work? If I have many images, does it mean I also have all the copies?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The container provides OS kernel, each image provides a “mounting” file system. There is a base image &lt;a href="https://docs.docker.com/samples/library/scratch/"&gt;“scratch”&lt;/a&gt; that contains almost nothing. Every docker image is built on top of another image. The ‘scratch’ image is the very root of them. Docker is adopting UnionFS to operate with image/container data. Take a look at &lt;a href="https://docs.docker.com/storage/storagedriver/"&gt;this article&lt;/a&gt; to understand how docker image layers work.  &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;3. When running container on Windows, is it running natively or still via the hyper-v?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Just had a look at &lt;a href="https://docs.microsoft.com/en-us/virtualization/windowscontainers/about/"&gt;this post&lt;/a&gt; from Microsoft. Windows container has two types of container, one is Windows Server Containers which is similar to Linux Container that sharing kernel between containers, the other is Hyper-V Isolation which is running a highly optimized Windows virtual machine.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;4. What’s the differences between image for windows container and image for linux container?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The containers share kernel with host OS, so only image that support the host kernel can be created in a container. In windows, we run a Linux container in a Linux virtual machine (docker host).&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;5. How do the images manage their versions?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Each image name contains three parts: registry, name and tag. The default registry is &lt;code&gt;docker.io&lt;/code&gt; and the default tag is &lt;code&gt;latest&lt;/code&gt;. Different version of the same image has different tag. For instance, &lt;a href="https://hub.docker.com/r/microsoft/dotnet-framework/"&gt;dotnet-framework&lt;/a&gt;has tags ‘4.7.2’, ‘4.7’, 4.6’ to differentiate each version.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;6. When I run a container without specify the image version, am I always getting the latest version?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;code&gt;docker run&lt;/code&gt; command will first try get the image from your local and then pull from server. So if you local repository happen cached the “latest” version, it won’t bother to pull another time. In this case you need to manually run &lt;code&gt;docker pull&lt;/code&gt; to update your local image.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;7. When ship the app, which way is better? Build image with application, or provision the container with the app after it is up.&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Because it is relatively cheap to build a docker image. Instead of running a lot overhead after a container started, it is better to wrap all you application into an image and deploy it directly on your server.&lt;/p&gt;</content><category term="Container"></category><category term="docker"></category><category term="container"></category></entry><entry><title>Way to typescript</title><link href="https://en.yangtalks.com/2018/way-to-typescript.html" rel="alternate"></link><published>2018-07-13T20:30:00+12:00</published><updated>2018-07-13T20:30:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-07-13:/2018/way-to-typescript.html</id><summary type="html">&lt;p&gt;&lt;img alt="grunt-typescript" src="https://en.yangtalks.com/2018/grunt-ts.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Recently team &lt;strong&gt;BOLT&lt;/strong&gt; just upgraded the NPM packages in &lt;strong&gt;Unleashed.UI&lt;/strong&gt; project and enabled the support of Typescript in the AngularJS app.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;
+The key to support TS in Unleashed.UI is to install the required packages and integrate …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="grunt-typescript" src="https://en.yangtalks.com/2018/grunt-ts.jpg"&gt;&lt;/p&gt;
+&lt;p&gt;Recently team &lt;strong&gt;BOLT&lt;/strong&gt; just upgraded the NPM packages in &lt;strong&gt;Unleashed.UI&lt;/strong&gt; project and enabled the support of Typescript in the AngularJS app.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;TL;DR&lt;/strong&gt;
+The key to support TS in Unleashed.UI is to install the required packages and integrate with existing Grunt tasks. This article will give a quick catchup of what Grunt is and how we integrate typescript with it in Unleashed solution.&lt;/p&gt;
+&lt;h2&gt;What's Grunt&lt;/h2&gt;
+&lt;p&gt;Unleashed.UI project uses Grunt as it's packing tools. In front-end world, a packing tool is used to process your code from writting language/format to a small/compatitable/performant version for real-world browsers. &lt;/p&gt;
+&lt;p&gt;Strictly speaking, Grunt is not a packing tool. It is designed as a "&lt;strong&gt;Task Runner&lt;/strong&gt;" that techinically can run every program on the machine. It has thousands of plugins for different scenarios to use. Packing a web application is one of the most common one. &lt;/p&gt;
+&lt;h2&gt;Understand the Grunt tasks&lt;/h2&gt;
+&lt;p&gt;Let's dive into the Grunt in Unleashed repo.&lt;/p&gt;
+&lt;p&gt;The Grunt auto loads the definitions of tasks from a &lt;code&gt;Gruntfile&lt;/code&gt;. It looks for the default name &lt;code&gt;Gruntfile.js&lt;/code&gt; or &lt;code&gt;Gruntfile.coffee&lt;/code&gt; under the same folder. (Only the config supports CoffeeScript natively) 
+&lt;em&gt;The file can also be specified with option &lt;code&gt;--Gruntfile &amp;lt;filename&amp;gt;&lt;/code&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;A task can be declared in two ways. One of them is to load tasks from plugin - NPM packages.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;loadNpmTasks&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;grunt-contrib-clean&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The other way is to call &lt;code&gt;registerTask&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;registerTask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;default&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;clean&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;build&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;registerTask&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;buildScript&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;target&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;ngtemplates&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="k"&gt;if&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;target&lt;/span&gt; &lt;span class="o"&gt;===&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;dist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;browserify:dist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;uglify:dist&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="k"&gt;else&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;browserify:debug&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;concat:js&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;task&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;run&lt;/span&gt;&lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;copy:scripts&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]);&lt;/span&gt;
+  &lt;span class="p"&gt;});&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The tasks loaded into grunt will be saved in key-value pairs. Each key represents the task name and the value is either the task option or the task implementation (function). You can run a specific task either by direct call with command &lt;code&gt;grunt &amp;lt;task name&amp;gt;&lt;/code&gt; or within another task. &lt;/p&gt;
+&lt;p&gt;In the above example, the task 'default' is defined to run task 'clean' and 'build'. The task 'buildScript' is a function that has our own implementation.&lt;/p&gt;
+&lt;h2&gt;Task Types&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Task from a grunt plugin&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;You can install a Grunt plugin from NPM. For example, the task 'clean' was from a plugin &lt;code&gt;grunt-contrib-clean&lt;/code&gt;. It can be installed as dev-dependencies:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm install --save-dev grunt-contrib-clean
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Afterward we can load the tasks from the plugin with &lt;code&gt;grunt.loadNpmTasks(...)&lt;/code&gt;. The usage/option usually can be found at its website, e.g. https://www.npmjs.com/package/grunt-contrib-clean. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Task to Run Multiple Tasks&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;The value of the task definition is an array of string, e.g. &lt;code&gt;'default': ['clean', 'build']&lt;/code&gt;. It helps to run multiple tasks with one command. It will run the tasks in sequence.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Custom Task&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Grunt supports to register a task as a function. When run the task it will just run the function. The function also supports parameters by using colon: &lt;code&gt;buildScript:dist&lt;/code&gt; equals to &lt;code&gt;buildScript(dist)&lt;/code&gt;. In each function you can run other tasks with method &lt;code&gt;grunt.task.run&lt;/code&gt; function.&lt;/p&gt;
+&lt;h2&gt;Configurations&lt;/h2&gt;
+&lt;p&gt;The options for each task is usually passed in with the object when initialize. 
+e.g. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;grunt&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;initConfig&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+        &lt;span class="nx"&gt;clean&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;options&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;force&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;}&lt;/span&gt;
+            &lt;span class="nx"&gt;dist&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="nx"&gt;files&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[{&lt;/span&gt; &lt;span class="nx"&gt;dot&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kc"&gt;true&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="nx"&gt;src&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;%= config.tmp %&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;&amp;lt;%= config.dist %&amp;gt;&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]}]}&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;})&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Task "browserify"&lt;/h2&gt;
+&lt;p&gt;The project &lt;a href="http://browserify.org/"&gt;browserify&lt;/a&gt; resolves the usage of 'require' for browsers. It bundles all the javascript codes that browsers need into a single &lt;code&gt;.js&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;Browserify supports plugins, The '&lt;a href="https://www.npmjs.com/package/coffeeify"&gt;coffeeify&lt;/a&gt;' is one of which that allows the 'browserify' to load coffee scripts and transform them into javascript. The '&lt;a href="https://www.npmjs.com/package/tsify"&gt;tsify&lt;/a&gt;' is the one for typescript.&lt;/p&gt;
+&lt;p&gt;Therefore, to support typescript in Unleashed.UI, we need to install '&lt;strong&gt;tsify&lt;/strong&gt;' along with native typescript package. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm install --save-dev typescrip tsify
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;One difference between 'tsify' and 'coffeeify' is that the 'tsify' doesn't support parameter 'transform'. So we need to &lt;a href="https://stackoverflow.com/questions/40182786/how-to-set-up-grunt-browserify-tsify-babelify"&gt;do some hack&lt;/a&gt; to make it work with 'coffeeify':&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;browserify&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="nx"&gt;options&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;configure&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="kd"&gt;function&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="k"&gt;return&lt;/span&gt; &lt;span class="nx"&gt;b&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;plugin&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;tsify&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+        &lt;span class="p"&gt;}&lt;/span&gt;
+    &lt;span class="p"&gt;},&lt;/span&gt;
+    &lt;span class="nx"&gt;server&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+        &lt;span class="nx"&gt;options&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+            &lt;span class="nx"&gt;transform&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;coffeeify&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+        &lt;span class="p"&gt;},&lt;/span&gt;
+        &lt;span class="nx"&gt;files&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="p"&gt;...&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;AngularJS Component in Typescript&lt;/h2&gt;
+&lt;p&gt;It's time to add a component in typescripts now!&lt;/p&gt;
+&lt;p&gt;First of all, install "type" for angular 1:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;npm install --save-dev @types/angular
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, we add "scripts" in &lt;code&gt;components/typescripts/hello.compoment.ts&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;HelloController&lt;/span&gt; &lt;span class="nx"&gt;implements&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IComponentController&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;message&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nb"&gt;String&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+      &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;message&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="sb"&gt;`Hello Typescript`&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="k"&gt;export&lt;/span&gt; &lt;span class="kd"&gt;class&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt; &lt;span class="nx"&gt;implements&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IComponentOptions&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;controller&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;Injectable&lt;/span&gt;&lt;span class="o"&gt;&amp;lt;&lt;/span&gt;&lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IControllerConstructor&lt;/span&gt;&lt;span class="o"&gt;&amp;gt;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;controllerAs&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="nx"&gt;public&lt;/span&gt; &lt;span class="nx"&gt;templateUrl&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;string&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+
+  &lt;span class="nx"&gt;constructor&lt;/span&gt;&lt;span class="p"&gt;(){&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;controller&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="nx"&gt;HelloController&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;controllerAs&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;vm&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+    &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;templateUrl&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;components/typescripts/hello.tpl.html&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+  &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+
+&lt;span class="nx"&gt;declare&lt;/span&gt; &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;angular&lt;/span&gt;&lt;span class="o"&gt;:&lt;/span&gt; &lt;span class="nx"&gt;ng&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;IAngularStatic&lt;/span&gt;
+&lt;span class="nx"&gt;angular&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;typescript&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[]).&lt;/span&gt;&lt;span class="nx"&gt;component&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;unlHello&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;In real world usage, you may want to declare all components for the same module together. So let's extract the last two lines into a seperate file. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;import&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt; &lt;span class="p"&gt;}&lt;/span&gt; &lt;span class="nx"&gt;from&lt;/span&gt; &lt;span class="s2"&gt;&amp;quot;./hello.component&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="kr"&gt;declare&lt;/span&gt; &lt;span class="kd"&gt;var&lt;/span&gt; &lt;span class="nx"&gt;angular&lt;/span&gt;: &lt;span class="kt"&gt;ng.IAngularStatic&lt;/span&gt;
+&lt;span class="nx"&gt;angular&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;module&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;typescript&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="p"&gt;[])&lt;/span&gt;
+    &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="nx"&gt;component&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;unlHello&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="k"&gt;new&lt;/span&gt; &lt;span class="nx"&gt;HelloOption&lt;/span&gt;&lt;span class="p"&gt;())&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Then, run the grunt task to transpile &amp;amp; package:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;grunt build
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Now you have a new component &lt;code&gt;unl-hello&lt;/code&gt; available in Unleashed web page!&lt;/p&gt;
+&lt;p&gt;You may have found that we use &lt;strong&gt;component&lt;/strong&gt; instead of &lt;strong&gt;directive&lt;/strong&gt; here. Moving forward it would be better to use the "component" instead of the "directives". The Angular Component was introduced in Angular 1.5 and is &lt;a href="https://angular.io/guide/upgrade#using-component-directives"&gt;recommended for upgrade to Angular 2+&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;At last, don't forget import your module in the Angular bootstraping file &lt;code&gt;app.coffee&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nx"&gt;require&lt;/span&gt; &lt;span class="s"&gt;&amp;#39;./components/typescripts/typescript&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;In modern web application development, packaging is becoming more and more important. It empowers the developers to generate more productivity with less efforts. With GruntJS's help, we can code with typescript in Unleashed.UI project now.&lt;/p&gt;</content><category term="Web"></category><category term="web"></category></entry><entry><title>Fast Build Your App with Vue.Js</title><link href="https://en.yangtalks.com/2018/vue-js.html" rel="alternate"></link><published>2018-07-03T20:10:00+12:00</published><updated>2018-07-03T20:10:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-07-03:/2018/vue-js.html</id><summary type="html">&lt;p&gt;&lt;img alt="vuejs" src="https://en.yangtalks.com/2018/vuejs.png"&gt;&lt;/p&gt;
+&lt;p&gt;I used to refuse front end development. I knew HTML, I knew CSS, I knew Javascript, but I didn’t know how they work together. Even later I had the knowledge of jQuery, of CoffeeScript, of AngularJS, I still didn …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;img alt="vuejs" src="https://en.yangtalks.com/2018/vuejs.png"&gt;&lt;/p&gt;
+&lt;p&gt;I used to refuse front end development. I knew HTML, I knew CSS, I knew Javascript, but I didn’t know how they work together. Even later I had the knowledge of jQuery, of CoffeeScript, of AngularJS, I still didn’t know how to build an app from scratch before long. &lt;/p&gt;
+&lt;p&gt;Recently I had a look into VueJS. I tried to use it to build up a simple web application. It did a good job and then I became a fan of it. In the whole development process, I took 99% of my time on the business logic, other than maintaining the framework NPM dependencies.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;What is VueJS?&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Vue is another modern web front-end framework which has the similar concept of MVVM with Angular or React. Vue is targeting lightweight and progressive and it made it. You can build modern single page application without having too many libraries or build scripts or other overheads.&lt;/p&gt;
+&lt;p&gt;Comparing to Angular 1 &amp;amp; 2, I have to say Vue.Js is far more friendly and easy to individual developers. It would be the best framework to start a small project or prototype an idea. &lt;/p&gt;
+&lt;p&gt;When I started the learning guide, I spent less than 1 hour to have an idea of how it makes the view model works. Then I started building an app. Vue simplifies the communications between HTML and JS. It fixed the biggest pain point of web development.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Hello World&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;As one line of code is worth a thousand words, let’s have a look at the Vue’s Hello World:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="nt"&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;script&lt;/span&gt; &lt;span class="na"&gt;src=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;https://vuejs.org/js/vue.js&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;div&lt;/span&gt; &lt;span class="na"&gt;id=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;app&amp;quot;&lt;/span&gt;&lt;span class="nt"&gt;&amp;gt;&lt;/span&gt;
+  &lt;span class="cp"&gt;{{&lt;/span&gt; &lt;span class="nv"&gt;message&lt;/span&gt; &lt;span class="cp"&gt;}}&lt;/span&gt;
+    &lt;span class="nt"&gt;&amp;lt;/div&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;script&amp;gt;&lt;/span&gt;
+var app = new Vue({
+  el: &amp;#39;#app&amp;#39;,
+  data: {
+    message: &amp;#39;Hello Vue!&amp;#39;
+  }}) 
+&lt;span class="nt"&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
+&lt;span class="nt"&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;The &lt;code&gt;div&lt;/code&gt; in Html defines the container of the Vue app. The instance of &lt;code&gt;Vue&lt;/code&gt; declares the view-model of the app. By giving value to the view-model, the UI (html) gets updated accordingly.&lt;/p&gt;
+&lt;p&gt;Pretty simple, right? If you like, you can open Chrome DevTools and update the view-model’s value in the console.
+    app.message = "Hey Vue"&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Highlights&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I’ll skip copying the simple guide from its &lt;a href="https://vuejs.org/v2/guide/"&gt;website&lt;/a&gt;. But I’ll give some highlights here.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;&lt;a href="https://vuejs.org/v2/guide/single-file-components.html"&gt;Single File Component&lt;/a&gt;&lt;/strong&gt;. 
+Single File Component means to compose HTML (template), Javascript (code) and CSS (styling) for one component into one file (&lt;code&gt;.vue&lt;/code&gt; file). Each &lt;code&gt;.vue&lt;/code&gt; file is a highly cohesive component. In addition, you won’t have to mess your project folder with a huge amount of files.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="Single File Component" src="https://en.yangtalks.com/2018/SFC.png"&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href="https://cli.vuejs.org/guide/prototyping.html"&gt;Instant Prototyping&lt;/a&gt;&lt;/strong&gt;. 
+With a &lt;code&gt;.vue&lt;/code&gt; file, you can start your new app in no time by using the &lt;code&gt;vue-cli&lt;/code&gt; tools. It auto downloads required references, build and trim, then output as a minified &lt;code&gt;html&lt;/code&gt; and &lt;code&gt;js&lt;/code&gt; files. You can choose either integrate the outputs with your existing project or put them on a web server as a static website. No pains about configurations. &lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;&lt;strong&gt;Vue DevTools&lt;/strong&gt;. 
+Install the &lt;a href="https://github.com/vuejs/vue-devtools"&gt;dev tools&lt;/a&gt; extension in your Chrome. Then every time you load a Vue app, you would be able to view the virtual structure of the app.&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img alt="devtools" src="https://en.yangtalks.com/2018/vue-devtool.png"&gt;&lt;/p&gt;
+&lt;p&gt;For those of you who are interested in the differences between Vue and Angular and React. Take a look at the full list &lt;a href="https://vuejs.org/v2/guide/comparison.html"&gt;here&lt;/a&gt;. It is highly recommended to read this. Not only for the difference but also for the key features of each framework.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;PS&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;I still remember how frustrated I was last year when I first time learned Angular 2. &lt;/p&gt;
+&lt;p&gt;Initially, I struggled from the bunch of &lt;code&gt;ng&lt;/code&gt; commands from its own &lt;code&gt;ng-cli&lt;/code&gt;. I had to carefully call the methods without knowing much what actually happened behind the scenes. Once a very trivial error happened I need to either started over again or spent heaps of time to google the solution. &lt;/p&gt;
+&lt;p&gt;Angular is using Typescript by default. So it became another overhead to get used to the syntax, as well we figure out how to transcompile to javascript.&lt;/p&gt;
+&lt;p&gt;On the other side, if you develop with Vue, you don’t need to worry about them at all. Write a &lt;code&gt;.vue&lt;/code&gt; file, and run with &lt;code&gt;vue-cli&lt;/code&gt;. That’s it! Starting a web app has never been so easy!&lt;/p&gt;</content><category term="Web"></category><category term="ef"></category></entry><entry><title>POCO and T4</title><link href="https://en.yangtalks.com/2018/poco-and-t4.html" rel="alternate"></link><published>2018-05-15T21:10:00+12:00</published><updated>2018-05-15T21:10:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-05-15:/2018/poco-and-t4.html</id><summary type="html">&lt;p&gt;It’s been a while not writing any post, I’ll try finish this series before I get tired of it. This time I’ll talk about two words - POCO and T4&lt;/p&gt;
+&lt;h2&gt;What is POCO?&lt;/h2&gt;
+&lt;p&gt;POCO is Plain Old CLR …&lt;/p&gt;</summary><content type="html">&lt;p&gt;It’s been a while not writing any post, I’ll try finish this series before I get tired of it. This time I’ll talk about two words - POCO and T4&lt;/p&gt;
+&lt;h2&gt;What is POCO?&lt;/h2&gt;
+&lt;p&gt;POCO is Plain Old CLR Object; a word from &lt;a href="https://en.wikipedia.org/wiki/Plain_old_Java_object"&gt;POJO&lt;/a&gt; - Plain Old Java Object - maybe, if for Lua it would be POLO, Golang is POGO, php is POPO, etc. &lt;/p&gt;
+&lt;p&gt;CLR is short for Common Language Runtime. It’s a very correct definition for POCO but to be easier, just use C# instead.&lt;/p&gt;
+&lt;p&gt;Plain Old - means simple, straight, no dependency whatsoever. &lt;/p&gt;
+&lt;p&gt;POCO class looks like this:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Product&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;Code&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="k"&gt;get&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;And Non-POCO class:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="na"&gt;[EdmEntityTypeAttribute(Namespace=&amp;quot;CMSModel&amp;quot;, Name=&amp;quot;Product&amp;quot;)]&lt;/span&gt;
+&lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Product&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="n"&gt;EntityObject&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="na"&gt;    [EdmScalarPropertyAttribute(EntityKeyProperty=true)]&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="kt"&gt;string&lt;/span&gt; &lt;span class="n"&gt;Code&lt;/span&gt; &lt;span class="p"&gt;{&lt;/span&gt;&lt;span class="k"&gt;get&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt; &lt;span class="k"&gt;set&lt;/span&gt;&lt;span class="p"&gt;;}&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Why POCO is better than non-POCO?&lt;/h2&gt;
+&lt;p&gt;Think of you already created a non-POCO classes that inherited or attributed with heaps of classes from EF libraries. You put all of these classes into assembly A, and you have another business project B which is dependent on A. Because you need to write logics for these classes so you also referred EF libraries in project B.&lt;/p&gt;
+&lt;p&gt;Normally you don’t update EF references in A too often as it may introduce unnecessary issues. As projects increasing, the dependencies become very complicated. EF library upgrade involves more and more projects that dependent on A or B. &lt;/p&gt;
+&lt;p&gt;At this point, if you have a project C and somehow it depends on A or B (closely or far away). Somehow, project C happen needs another functionality in one of EF libraries; a higher version than the one referenced by project A. Then the conflicts come up.&lt;/p&gt;
+&lt;p&gt;Some time you can be aware of the conflicts and avoid them in advance. But some time you wouldn’t notice them until something is wrong.&lt;/p&gt;
+&lt;p&gt;But if you use POCO at the very beginning, you won’t have these trouble as you never reference EF libraries in A or B. &lt;/p&gt;
+&lt;h2&gt;What does POCO to do with Entity Framework?&lt;/h2&gt;
+&lt;p&gt;CSDL defines the conceptual models, but it’s not possible to code with the XML data.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="csdl" src="https://en.yangtalks.com/2018/CSDL.png"&gt;&lt;/p&gt;
+&lt;p&gt;To archive this, Visual Studio analyzes the CSDL data and automatically generate C# classes. (Microsoft used to love making things automatically. End-users love that but not the programmers, especially when they frequently get a blue image on their screen.) &lt;/p&gt;
+&lt;p&gt;The generated classes are non-POCO classes and it would introduce issues that we mentioned earlier.&lt;/p&gt;
+&lt;p&gt;With POCO classes, the models are more deliberate now. Any changes on framework or dependencies won’t effects the existing codes. &lt;/p&gt;
+&lt;p&gt;The whole process used to be &lt;code&gt;CSDL -&amp;gt; Auto Generating -&amp;gt; Generated Classes&lt;/code&gt; . EF takes CSDL as input and domain classes as output.&lt;/p&gt;
+&lt;p&gt;Now the process is &lt;code&gt;CSDL -&amp;gt; POCO Classes -&amp;gt; Auto Mapping&lt;/code&gt;. Both CSDL and POCO classes become input and EF will get them mapped at runtime.&lt;/p&gt;
+&lt;p&gt;The removed &lt;code&gt;Auto Generating&lt;/code&gt; later became the new Code Generation tool — T4 Template.&lt;/p&gt;
+&lt;h2&gt;What is T4 Template?&lt;/h2&gt;
+&lt;p&gt;T4 is short for Text Template Transformation Toolkit. It’s a template processor, similar to Razor in ASP.NET. Normal template processor render for html, and T4 also supports rendering code from code. &lt;/p&gt;
+&lt;p&gt;It’s like writing code to let it auto write code. Unfortunately, it is not as fancy as it sounds like. Sometimes it introduces more troubles than what it might have saved.&lt;/p&gt;
+&lt;p&gt;There are two signs to tell if use T4 or not. First, do you need to write similar code for a large amount of sources? Second, will you modify the generated code frequently(can it be overwritten safely)? Both of them are what POCO meets.&lt;/p&gt;
+&lt;p&gt;Here’s an example of T4 template:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;template&lt;/span&gt; &lt;span class="n"&gt;debug&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;false&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;hostspecific&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;true&amp;quot;&lt;/span&gt; &lt;span class="n"&gt;language&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;C#&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;assembly&lt;/span&gt; &lt;span class="n"&gt;name&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Core&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Linq&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Text&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.IO&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;import&lt;/span&gt; &lt;span class="n"&gt;namespace&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;System.Collections.Generic&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#@&lt;/span&gt; &lt;span class="n"&gt;output&lt;/span&gt; &lt;span class="n"&gt;extension&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;.cs&amp;quot;&lt;/span&gt; &lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="k"&gt;namespace&lt;/span&gt; &lt;span class="nn"&gt;T4Testing&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;
+&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;ttFilePath&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;this&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Host&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ResolvePath&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s"&gt;&amp;quot;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;File&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ReadLines&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;ttFilePath&lt;/span&gt; &lt;span class="p"&gt;+&lt;/span&gt; &lt;span class="s"&gt;@&amp;quot;\data.txt&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="k"&gt;foreach&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;data&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;partial&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;line&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt; 
+    &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Something&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;
+&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;&lt;span class="err"&gt;#&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;&lt;/span&gt;
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It reads lines from &lt;code&gt;data.txt&lt;/code&gt; file and generate &lt;code&gt;partial&lt;/code&gt; classes for each line.&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;data.txt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="err"&gt;    Pyramid&lt;/span&gt;
+&lt;span class="err"&gt;    Cube&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;code&gt;code.cs&lt;/code&gt;:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;namespace&lt;/span&gt; &lt;span class="nn"&gt;T4Testing&lt;/span&gt;
+&lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;partial&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Pyramid&lt;/span&gt; 
+    &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Something&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;   
+    &lt;span class="k"&gt;public&lt;/span&gt; &lt;span class="k"&gt;partial&lt;/span&gt; &lt;span class="k"&gt;class&lt;/span&gt; &lt;span class="nc"&gt;Cube&lt;/span&gt; 
+    &lt;span class="p"&gt;{&lt;/span&gt;
+    &lt;span class="c1"&gt;// Something&lt;/span&gt;
+    &lt;span class="p"&gt;}&lt;/span&gt;   
+&lt;span class="p"&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;Frankly speaking (typing), writing a T4 template to generate code is more interesting than what it is generating.&lt;/strong&gt; For modern IDEs like Visual Studio, with or without ReSharper, it always provides a deadly easy way to guess what you are trying to code. T4 is useful only if you need to type a large number of similar code. Even in that case, it is more likely a one-off thing that you can throw it away as soon as it has created the classes. Because the more important and difficult part for each class is business logic.&lt;/p&gt;
+&lt;p&gt;Some would say that logic can also be defined in structured format like XML. It’s doable but if so you’ll need to write code to parse and convert them from XML to your T4 code. The effort and complexity is not reduced by doing so and it will even create a lot of new troubles.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Entity Data Model Generation</title><link href="https://en.yangtalks.com/2018/edm-generation.html" rel="alternate"></link><published>2018-04-18T23:10:00+12:00</published><updated>2018-04-18T23:10:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-04-18:/2018/edm-generation.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Database/Model First&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's get one step back and have a quick look at how the conceptual models had been built at the beginning.&lt;/p&gt;
+&lt;p&gt;Before we build the database and the program, there's an equal chance for either having database …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Database/Model First&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Let's get one step back and have a quick look at how the conceptual models had been built at the beginning.&lt;/p&gt;
+&lt;p&gt;Before we build the database and the program, there's an equal chance for either having database design first or having domain model design first. Initially Visual Studio supports both ways to create the Entity Data Model, one of which called &lt;strong&gt;Database First&lt;/strong&gt; and the other called &lt;strong&gt;Model First&lt;/strong&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;Database First&lt;/strong&gt; utilizes reverse engining to generate the EMD from an existing database. &lt;strong&gt;Model First&lt;/strong&gt; is the other way around that the database is created/updated after EDM is finished in the designer.&lt;/p&gt;
+&lt;p&gt;With &lt;strong&gt;Database First&lt;/strong&gt;, the update direction will always be from database to models. Every changes on databases can be updated to models by redo the operation. On the other hand, in &lt;strong&gt;Model First&lt;/strong&gt; any changes to the database may be before you applied them to models. However, Model First allows developers to design the app without concerning too much on database structure, which can help build the prototype quickly.&lt;/p&gt;
+&lt;p&gt;These days, the border between these two ways has been becoming more blurrier. They all eventually build up with the EDMX file and can be maintained from the “designer”— either use command &lt;code&gt;Update Model from Database&lt;/code&gt; to update the EDM, or &lt;code&gt;Generate Database from Model&lt;/code&gt; to create sql scripts re-generating the whole database.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Operation in Visual Studio EDMX Designer" src="https://en.yangtalks.com/2018/EDM-designer.png"&gt;
+*Operation in Visual Studio EDMX Designer&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Code First&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;The &lt;strong&gt;Code First&lt;/strong&gt; was a “new” concept since EF 4.1 but it didn’t get much promotion until EF 6. A lot of  improvements were made in EF 6 including Fluent API (&lt;em&gt;to configure EDM mappings by codes&lt;/em&gt;) and migration tools(&lt;em&gt;to manage database changes&lt;/em&gt;). Hardcore programmers finally got rid of the designer when deal with databases. At the version of EF 6.1, it introduced the ability to generate&lt;strong&gt;Code First&lt;/strong&gt; model from database — it helps existing app get transfered to &lt;strong&gt;Code First&lt;/strong&gt; if the team wants. &lt;/p&gt;
+&lt;p&gt;In EF Core (or EF7), the &lt;strong&gt;Code First&lt;/strong&gt; will be the only way to create EDM.( We can tell how much MS is willing to retire the visual designer. The key feature to support “code first” is &lt;strong&gt;migration&lt;/strong&gt;, it allows developers update both the classes and database at the same time without losing any data. The migration also makes it possible to upgrade the db at any point to the latest version. The developers will not need to maintain the DB upgrade manually anymore.&lt;/p&gt;
+&lt;p&gt;I am in favor of the &lt;strong&gt;Code First&lt;/strong&gt; as I really love the idea that maintaining the database via codes. It means by tracking the code changes you’ll be able to have the view of the actually history of the realistic entity.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="Choose how to create EDM" src="https://en.yangtalks.com/2018/modeling-work-flow-options.png"&gt;
+*Choose how to create EDM&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Entity Object Tracking</title><link href="https://en.yangtalks.com/2018/entity-object-tracking.html" rel="alternate"></link><published>2018-04-04T21:09:00+12:00</published><updated>2018-04-04T21:09:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-04-04:/2018/entity-object-tracking.html</id><summary type="html">&lt;p&gt;&lt;strong&gt;Object State&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Last time we introduced how to query database from conceptual models. It includes LINQ to Entities and Entity SQL. With &lt;code&gt;IQueryable&lt;/code&gt; object, the sql script will be built and executed automatically within the method &lt;code&gt;.ToList()&lt;/code&gt;. After the data …&lt;/p&gt;</summary><content type="html">&lt;p&gt;&lt;strong&gt;Object State&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Last time we introduced how to query database from conceptual models. It includes LINQ to Entities and Entity SQL. With &lt;code&gt;IQueryable&lt;/code&gt; object, the sql script will be built and executed automatically within the method &lt;code&gt;.ToList()&lt;/code&gt;. After the data is loaded in our program, we'll operate against them and save changes back to the database. Today we'll talk about how Entity Framework manage the changes in our program.&lt;/p&gt;
+&lt;p&gt;When the query executes through &lt;code&gt;ObjectContext&lt;/code&gt; and is materialized into objects, Entity Framework takes a snapshot of an entity’s values. The context stores two set of values of the entity. One of them is the original values of the object and it remains static. The other one will be a realtime values that being modified in the program. The object that saved the two set of values is named &lt;code&gt;ObjectStateEntry&lt;/code&gt;. Every object returned from database will have an instance of &lt;code&gt;ObjectStateEntry&lt;/code&gt; as a shadow.&lt;/p&gt;
+&lt;p&gt;Each &lt;code&gt;ObjectStateEntry&lt;/code&gt; has a property &lt;code&gt;State&lt;/code&gt; to reflect the state of the entity(&lt;code&gt;Unchanged&lt;/code&gt;, &lt;code&gt;Modified&lt;/code&gt;, &lt;code&gt;Added&lt;/code&gt; or &lt;code&gt;Deleted&lt;/code&gt;). As the user modifies the objects, the &lt;code&gt;ObjectContext&lt;/code&gt; updates  the  current  values  of  the  related  &lt;code&gt;ObjectStateEntry&lt;/code&gt;  as  well  as  its &lt;code&gt;State&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;The entity object  itself  also has an &lt;code&gt;EntityState&lt;/code&gt; property, which it inherits from &lt;code&gt;EntityObject&lt;/code&gt;. As long as the object is being managed by the context, its &lt;code&gt;EntityState&lt;/code&gt; will always match the &lt;code&gt;State&lt;/code&gt; of the &lt;code&gt;ObjectStateEntry&lt;/code&gt;. If the object is not being managed by the context, there is no &lt;code&gt;ObjectStateEntry&lt;/code&gt; and the entity’s &lt;code&gt;State&lt;/code&gt; is &lt;code&gt;Detached&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;Save Changes&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;After finish modifying conceptual objects that loaded from context, we could easily get these changes applied to database by call the method of &lt;code&gt;SaveChanges&lt;/code&gt; against the context. And by doing that all the SQL scripts will be automatically generated and executed.&lt;/p&gt;
+&lt;p&gt;When the context was notified of a property change, not only did it modify the current value in the &lt;code&gt;ObjectStateEntry&lt;/code&gt;, but it also set another tracking value that indicates that the property was changed. During &lt;code&gt;SaveChanges&lt;/code&gt;, the context then looks for those tracking values to determine which fields were changed.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;customer&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;FirstOrDefault&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt; &lt;span class="p"&gt;==&lt;/span&gt; &lt;span class="s"&gt;&amp;quot;Jason&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;span class="n"&gt;customer&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;IsObsolete&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;true&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="n"&gt;context&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SaveChanges&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;WIth SQL Profiler, we'll get the executing sql:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;exec&lt;/span&gt; &lt;span class="n"&gt;sp_executesql&lt;/span&gt; &lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;update&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;dbo&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="n"&gt;set&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;IsObsolete&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;@0&lt;/span&gt;
+&lt;span class="n"&gt;where&lt;/span&gt; &lt;span class="p"&gt;([&lt;/span&gt;&lt;span class="n"&gt;Name&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;@1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="n"&gt;N&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="mi"&gt;@0&lt;/span&gt; &lt;span class="n"&gt;bit&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;@1&lt;/span&gt; &lt;span class="n"&gt;nvarchar&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;50&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;@0&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;@1&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;&lt;span class="n"&gt;Jason&lt;/span&gt;&lt;span class="err"&gt;&amp;#39;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;&lt;strong&gt;No Tracking&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;No tracking query, as the name suggest, means the objects that returned by the query would not be managed by the context. Though it relates to what is called &lt;code&gt;MergeOption&lt;/code&gt; for querying, which controls how to deal with result with existing cached objects in context (queried in the same transaction).&lt;/p&gt;
+&lt;p&gt;When querying with &lt;code&gt;NoTracking&lt;/code&gt; option, it does not only means the &lt;code&gt;SaveChanges&lt;/code&gt; will not save any changes on those objects, but also means all the &lt;code&gt;ObjectStateEntry&lt;/code&gt; objects creation will be skipped by Entity Framework. Based on these two features, &lt;code&gt;NoTracking&lt;/code&gt; is often used for readonly data querying and it improves the performance significantly for large volume of data.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Query in Entity Framework</title><link href="https://en.yangtalks.com/2018/query-in-ef.html" rel="alternate"></link><published>2018-03-22T21:09:00+13:00</published><updated>2018-03-22T21:09:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-03-22:/2018/query-in-ef.html</id><summary type="html">&lt;p&gt;With Entity Data Model, we built the connection between conceptual models and database schema. The next question would be how we’re going to code with the EDM objects.&lt;/p&gt;
+&lt;p&gt;Today we’ll have a quick view to LINQ to Entities …&lt;/p&gt;</summary><content type="html">&lt;p&gt;With Entity Data Model, we built the connection between conceptual models and database schema. The next question would be how we’re going to code with the EDM objects.&lt;/p&gt;
+&lt;p&gt;Today we’ll have a quick view to LINQ to Entities, which is the main way developing with conceptual models, as well as Entity SQL —a storage independent query language. Either way the queries would eventually be transformed to corresponding sql query to database.&lt;/p&gt;
+&lt;h3&gt;LINQ to Entities&lt;/h3&gt;
+&lt;p&gt;LINQ is an acronym stands for &lt;a href="https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/linq/"&gt;Language-INtegrated Query&lt;/a&gt;. It is a set of query technologies that allow you to create an unified query against different data sources. So on language level, it represents a bunch of methods to operate object sets. &lt;/p&gt;
+&lt;p&gt;When LINQ applied with Entity Framework, we got three different technologies: &lt;a href="https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/linq-and-ado-net"&gt;LINQ to DateSet, LINQ to SQL and LINQ to Entities&lt;/a&gt;. This time we'll talk about LINQ to Entities only.&lt;/p&gt;
+&lt;p&gt;LINQ to Entities supports both query syntax and method syntax of LINQ. Query syntax is similar to SQL query, writing with c#, you can compose you LINQ inline by using &lt;em&gt;from/where/select&lt;/em&gt; keywords:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;customers&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;from&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="k"&gt;in&lt;/span&gt; &lt;span class="n"&gt;DbContext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Set&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;()&lt;/span&gt;
+                            &lt;span class="k"&gt;where&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Deleted&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;
+                            &lt;span class="k"&gt;select&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;blockquote&gt;
+&lt;p&gt;The reason why LINQ query starts with &lt;code&gt;from&lt;/code&gt; instead of &lt;code&gt;select&lt;/code&gt;, it must be for enabling IntelliSense while editing. It's happening all the time in Sql Server Management Tool that column names only get populated after you typed table name -- which always be the second line of your script.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;WIth method syntax, on the other hand, the code can be more straight forward:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kt"&gt;var&lt;/span&gt; &lt;span class="n"&gt;customers&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;DbContext&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Set&lt;/span&gt;&lt;span class="p"&gt;&amp;lt;&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;&amp;gt;()&lt;/span&gt;
+                &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Where&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Deleted&lt;/span&gt; &lt;span class="p"&gt;==&lt;/span&gt; &lt;span class="k"&gt;false&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+                &lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Select&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;c&lt;/span&gt; &lt;span class="p"&gt;=&amp;gt;&lt;/span&gt; &lt;span class="n"&gt;c&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;);&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;Both methods result to a same data set in &lt;code&gt;customers&lt;/code&gt; variable and both the types of the variables would  be &lt;code&gt;IQueryable&lt;/code&gt;. Everyone new to LINQ to Entities must be careful with the differences between &lt;code&gt;IQueryable&lt;/code&gt; and &lt;code&gt;IEnumerable&lt;/code&gt;. The &lt;code&gt;IQueryable&lt;/code&gt; contains metadata about the query, such as the query expression and the provider being used, and it only has result returned within the object after the query inside is executed. The easiest way to execute the query and convert a &lt;code&gt;IQueryable&lt;/code&gt; to a &lt;code&gt;IEnumerable&lt;/code&gt; is call &lt;code&gt;.ToList()&lt;/code&gt;.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;customers&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ToList&lt;/span&gt;&lt;span class="p"&gt;()&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;blockquote&gt;
+&lt;p&gt;Under the cover, &lt;code&gt;IQueryable&lt;/code&gt; is building an expression tree when you fill your chaining methods. The execution of the &lt;code&gt;IQueryable&lt;/code&gt; varies based on different data provider. It converts the expression tree into format the provider recongnized and send it to the corresponding server. Potentially it could support all data sources, as long as there is an implementation of &lt;code&gt;IQueryable&lt;/code&gt; from those providers.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;The expression above  would be executed on our DB server  and return the result into a &lt;code&gt;List&amp;lt;T&amp;gt;&lt;/code&gt; object. This query can be easily monitored with &lt;a href="https://docs.microsoft.com/en-us/sql/tools/sql-server-profiler/sql-server-profiler"&gt;SQL Server Profiler&lt;/a&gt; if you're using MS SQL Server. It would look like:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;SELECT&lt;/span&gt;
+&lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extent1&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Id&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;FROM&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;dbo&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Customers&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="k"&gt;AS&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extent1&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="k"&gt;WHERE&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="n"&gt;Extent1&lt;/span&gt;&lt;span class="p"&gt;].[&lt;/span&gt;&lt;span class="n"&gt;Deleted&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="mi"&gt;0&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;p&gt;It's fairly a simple SQL query that generated from our code but sometimes the queries may look more complex. We might come back and talk to its impact on performance later.&lt;/p&gt;
+&lt;h3&gt;Entity SQL&lt;/h3&gt;
+&lt;p&gt;What is Entity SQL? &lt;/p&gt;
+&lt;p&gt;Well, Entity SQL is another query language Microsoft invented .... to consume your enthusiasms on SQL-like languages. &lt;/p&gt;
+&lt;p&gt;Here's the way using Entity SQL to implement our query to get customers id:&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;EntityCommand&lt;/span&gt; &lt;span class="n"&gt;cmd&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;conn&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CreateCommand&lt;/span&gt;&lt;span class="p"&gt;();&lt;/span&gt;
+&lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;CommandText&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="s"&gt;@&amp;quot;SELECT VALUE c.Id FROM Customers AS c WHERE c.Deleted = 0&amp;quot;&lt;/span&gt;
+&lt;span class="n"&gt;EntityDataReader&lt;/span&gt; &lt;span class="n"&gt;reader&lt;/span&gt; &lt;span class="p"&gt;=&lt;/span&gt; &lt;span class="n"&gt;cmd&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;ExecuteReader&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;CommandBehavior&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;SequentialAccess&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="c1"&gt;// Extract data from reader&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+
+
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;In this post we talked about approaches to query database with Entity Framework. There is no doubt that my favorite one is to use LINQ chaining methods. It helps you validate in compile time so you can always focus on the business logics.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Entity Data Model XML</title><link href="https://en.yangtalks.com/2018/entity-data-model-xml.html" rel="alternate"></link><published>2018-03-15T22:00:00+13:00</published><updated>2018-03-15T22:00:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-03-15:/2018/entity-data-model-xml.html</id><summary type="html">&lt;p&gt;Last time, we described how Entity Data Model(EDM) was designated to help DBA and developer to work with their own contexts. Today let’s dig deeper into EDM to see what it consists of and what it looks like …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Last time, we described how Entity Data Model(EDM) was designated to help DBA and developer to work with their own contexts. Today let’s dig deeper into EDM to see what it consists of and what it looks like in reality.&lt;/p&gt;
+&lt;h2&gt;Core Concepts&lt;/h2&gt;
+&lt;p&gt;The EDM uses three key concepts to describe the structure of data: &lt;strong&gt;entity type&lt;/strong&gt;, &lt;strong&gt;association type&lt;/strong&gt;, and &lt;strong&gt;property&lt;/strong&gt;. These are the most important concepts in describing the structure of data in any implementation of the EDM.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="entity data model" src="https://i-msdn.sec.s-msft.com/dynimg/IC315129.gif"&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Entity Type&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;In a conceptual model, entity types are constructed from properties and describe the structure of top-level concepts, such as a customers and orders in a business application. It is not necessarily A table in database, it is meant to face the application.
+&lt;em&gt;Inheritance is supported with entity types.&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Property&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Like an object in a programming language, entity types contain properties that define the structure and characteristics. For example, a Customer entity type may have properties such as CustomerId, Name, and Address.
+&lt;em&gt;Normal properties can only contains primitive data(string/int/bit)&lt;/em&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Association Type&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;An association represents a relationship between two entity types (such as Customer and Order). Every association has two ends that specify the entity types involved. An association end owns a multiplicity that can have a value of one (1), zero or one (0..1), or many (*). 
+&lt;em&gt;Entities at one end of an association can be accessed through navigation properties. We’ll talk navigation properties in later posts&lt;/em&gt;&lt;/p&gt;
+&lt;h2&gt;Entity Data Model XML (EDMX)&lt;/h2&gt;
+&lt;p&gt;Entity Data Model is a concept. The Entity Framework has a particular implementation that is realized as the EDMX file at design time. The EDMX file is a XML document under the cover and it is made of three layers. These three layers have nothing to do with EDM but an implementation within Entity Framework.&lt;/p&gt;
+&lt;p&gt;The first one layer of the three represents the conceptual model, which is the actual EDM. The second one represents the database schema, and the third represents the mappings between the first two. Each of the layers will become a XML file at run time, ended with CSDL, SSDL and MDL respectively.&lt;/p&gt;
+&lt;p&gt;If we open an EDMX file in XML editor, you’ll see these three parts in the file content.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="EDMX" src="https://en.yangtalks.com/2018/EDMX.png"&gt;&lt;/p&gt;
+&lt;p&gt;The file composed of two main sections: the runtime information and the designer information. The three parts that we are going to talk about are all in the runtime section.&lt;/p&gt;
+&lt;h3&gt;CSDL&lt;/h3&gt;
+&lt;p&gt;The conceptual content includes everything needed in a EDM model, including entity type/property/association. Check out the file yourself:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="CSDL" src="https://en.yangtalks.com/2018/CSDL.png"&gt;&lt;/p&gt;
+&lt;p&gt;The entity container have EntitySets and AssociationSets. Each child represents a Entity Type or Association Type. After the container it lists all the entity type with defined properties and property’s properties.&lt;/p&gt;
+&lt;h3&gt;SSDL&lt;/h3&gt;
+&lt;p&gt;The StorageModels section of an EDMX file is a schematic representation of its associated data store. The elements of this file are similar to those of the CSDL file. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="EDMX" src="https://en.yangtalks.com/2018/SSDL.png"&gt;&lt;/p&gt;
+&lt;p&gt;For consistency, the tables and columns are called EntityType and Property. You will see these referred to in documentation as tables and columns, and even as such in the visual tools.  The difference is: the entity type names are the actual names of the tables in the database and the property types are the data store data types. &lt;/p&gt;
+&lt;h3&gt;MDL&lt;/h3&gt;
+&lt;p&gt;The Mapping section is quite straight forward that it contains the field mappings between conceptual model and store model. As we talked in &lt;a href="https://en.yangtalks.com/2018/introduction-to-entity-data-model.html"&gt;last post&lt;/a&gt;, one entity type in CSDL may relate to multiple tables from SSDL. In that case you would see multiple &lt;em&gt;MappingFragment&lt;/em&gt; nodes under each entity set mapping.&lt;/p&gt;
+&lt;h2&gt;Summary&lt;/h2&gt;
+&lt;p&gt;So far we have had a general view of what entity data model consists of in real life and the inner structures in EDMX file. One practical benefit I had seen from these knowledge is that this give us a way to update the EDMX file without manually “Update Model from Database” from UI — which cost one hour to finish! 
+&lt;em&gt;(PS: A good news is in Entity Framework 6, the reload performance has been improved from 60 minutes to 30 seconds!)&lt;/em&gt;&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Introduction to Entity Data Model</title><link href="https://en.yangtalks.com/2018/introduction-to-entity-data-model.html" rel="alternate"></link><published>2018-03-08T23:14:00+13:00</published><updated>2018-03-08T23:14:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2018-03-08:/2018/introduction-to-entity-data-model.html</id><summary type="html">&lt;blockquote&gt;
+&lt;p&gt;There is always something exists for a mysterious reason. 'Mysterious' doesn't mean it is unknown, but we are too lazy to know. The Entity Framework technology is one of those things for me. It was set up at the very …&lt;/p&gt;&lt;/blockquote&gt;</summary><content type="html">&lt;blockquote&gt;
+&lt;p&gt;There is always something exists for a mysterious reason. 'Mysterious' doesn't mean it is unknown, but we are too lazy to know. The Entity Framework technology is one of those things for me. It was set up at the very beginning for a solution and it only needs a very little bit maintenance. Detailed instructions have been written and all we need to do is to follow them and make sure nothing is broken. Recently we met a few of issues related to entity framework and it drives me to take some effort on it.&lt;/p&gt;
+&lt;p&gt;While learning on the big topic, I’m going to post some notes as well. I'm going to talk about Entity Framework by sessions in the following few weeks. I will cover as much as I can for the topic and hopefully I can stick to it. Today I'll start with entity data model(EDM), a very core and basic concept in Entity Framework.&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h2&gt;Entity Data Model&lt;/h2&gt;
+&lt;p&gt;In terms of model, we have two kinds of types here - one for database and one for the application that we build.&lt;/p&gt;
+&lt;p&gt;On application side, a model particularly means an object of a class that developers code against with. It is from the concept of 'object-oriented' programming and an object is an abstraction of the real world.&lt;/p&gt;
+&lt;p&gt;In database, on the other hand, a model is more likely a schema of how data being stored. As we're talking about relational database, a schema is a database structure that is designed based on [Entity Relationship Model]. &lt;/p&gt;
+&lt;p&gt;To fill the gap between application and database, developers used to manually writing SQLs to handle the communications and conversions.  It takes long time to code and longer time to maintain them. To resolve the complicity and time-wasting, the technology of ORM ([object relational mapping]) came into being. The ORM is trying to build a bridge between database and programming language, helping you do the dirty jobs. &lt;/p&gt;
+&lt;p&gt;Entity Framework is one of ORM technology and Entity Data Model is a middle layer that abstracts entities from database into programming objects. It abstracts the database tables into objects, which you can directly code against with. Also the EDM designer helps you to virtualize you database structures so you could have a greater view of what your data would looks like. What's more, it split the responsibilities of program design and database design. With EDM, you can have your database administrator to design a well normalized database when your developer can comfortably program with business objects. EDM covers the underlying operations.&lt;/p&gt;
+&lt;h2&gt;Example&lt;/h2&gt;
+&lt;p&gt;To make it more sensible, I'm giving(copying) a simple example here:&lt;/p&gt;
+&lt;p&gt;&lt;img alt="DB schema" src="https://en.yangtalks.com/2018/db-schema.png"&gt;&lt;/p&gt;
+&lt;p&gt;The figure shows the schema of a typical set of tables in a database. &lt;code&gt;PersonalDetails&lt;/code&gt; provides additional information about a &lt;code&gt;Person&lt;/code&gt; that the database administrator has chosen to put into a separate table for the sake of scalability. &lt;code&gt;SalesPerson&lt;/code&gt; is a table that is used to provide additional information for those who are salespeople. &lt;/p&gt;
+&lt;p&gt;Working with this data from an application requires queries that are full of inner joins and outer joins to access the additional data about Person records. Or you will access a variety of predefined stored procedures and views, which might each require a different set of parameters and return data that is shaped in a variety of ways. &lt;/p&gt;
+&lt;p&gt;&lt;img alt="Entities" src="https://en.yangtalks.com/2018/entities-models.png"&gt;&lt;/p&gt;
+&lt;p&gt;By using EDM, the application could have its own view of what you wish the database looked like. Figure above reshapes the schema. &lt;/p&gt;
+&lt;p&gt;All of the fields from &lt;code&gt;PersonalDetails&lt;/code&gt; are now part of &lt;code&gt;Person&lt;/code&gt;. And &lt;code&gt;SalesPerson&lt;/code&gt; is doing something that is not even possible in a database: it is deriving from &lt;code&gt;Person&lt;/code&gt;, just as you would in an object model. &lt;/p&gt;
+&lt;p&gt;In summary, the Entity Data Model enables you to code against strongly typed entity classes, not database schema and objects. Also it enables you to customize the mappings between entity classes and database tables to move beyond one-to-one mapping or class-to-table mapping.&lt;/p&gt;</content><category term="EntityFramework"></category><category term="ef"></category></entry><entry><title>Docker and dockerspace</title><link href="https://en.yangtalks.com/2017/docker-and-dockerspace.html" rel="alternate"></link><published>2017-06-26T21:14:00+12:00</published><updated>2017-06-26T21:14:00+12:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2017-06-26:/2017/docker-and-dockerspace.html</id><summary type="html">&lt;h3&gt;Dev&lt;/h3&gt;
+&lt;p&gt;There’s a common experience for every developer that new to a company. It’s painful, annoying and frustrating. Everyone knows it would be there but nobody can avoid it. And the pain itself, later on, would also become …&lt;/p&gt;</summary><content type="html">&lt;h3&gt;Dev&lt;/h3&gt;
+&lt;p&gt;There’s a common experience for every developer that new to a company. It’s painful, annoying and frustrating. Everyone knows it would be there but nobody can avoid it. And the pain itself, later on, would also become a sort of asset, privilege or proof that the people experienced this are more senior. &lt;/p&gt;
+&lt;p&gt;The name of this experience is called ’setup’. You’ll have to setup many softwares on your computer before you really start writing  piece of code. And normally it won’t success at the first time. You’ll have to pray and try again for quite a few times.&lt;/p&gt;
+&lt;h3&gt;QA&lt;/h3&gt;
+&lt;p&gt;Similar pain happens to new QA as well. However, instead of downloading and clicking the setup files one by one, the things they need to know before testing is to familiar with all QA environments. Which one is for functional testing, which one is for alpha/beta testing, etc.&lt;/p&gt;
+&lt;p&gt;Different than developers, what’s more, their pain doesn’t stop there. There are a lot of conversations between developers and QA are like, “it’s start not working on A machine. ” “Let me see..(after a while)..I have no idea. Have you tried on other environments?” ”Let me try… It’s working in B!” ”Sh*t, Could you switch to B for testing for now?” Moreover, the most famous rumor from developers: &lt;strong&gt;works on my machine&lt;/strong&gt; is happening day by day.&lt;/p&gt;
+&lt;h3&gt;Ops&lt;/h3&gt;
+&lt;p&gt;Infrastructures are becoming more and more complicated but unfortunately, it can be hardly tested by our QA before it is released. So we’ll always need a post release test to make sure what have deployed is as same as what have been tested. So every release will be a gambling. It makes our system unstable and by nature we don’t like it .&lt;/p&gt;
+&lt;p&gt;As we’re growing quickly, the system will be also introducing more technologies along with more infrastructures. Think about what have we started using in our production during the past few years. Redis, Riak, Rackspaces, Azure WorkerRole/WebRole/ServiceBus, CouchDB, ElasticSearch and there will be more, I believe, are coming.&lt;/p&gt;
+&lt;h3&gt;Docker&lt;/h3&gt;
+&lt;p&gt;As you can see, things are getting complicated. People don’t like complicity, that’s why they use Unleashed. We don’t like complicity either, so we should use Docker.&lt;/p&gt;
+&lt;p&gt;Literally docker is the person that working on a dock. They help manage containers and ship them to anywhere.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="docker-logo" src="https://en.yangtalks.com/2017/docker-logo.png"&gt;
+I’d say that's a very accurate analogy for Docker actually. Container technology has been in Linux system for years and Docker is actually a tool that written in Go managing those containers on Linux. It only helps us manage these containers so that we can use a few of simple commands to start or stop our apps in a single computing resource, which mostly is our server or vm whatever, in few seconds.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="container" src="https://en.yangtalks.com/2017/container.png"&gt;&lt;/p&gt;
+&lt;p&gt;If you used to know what virtual machine is and you may feel  container is very similar to it. Yes they are similar but not that very. &lt;/p&gt;
+&lt;p&gt;Both VM and container are designed to provide an isolated environment in which to run an application. Additionally, in both cases that environment is represented as a binary artifact which can be moved between different hosts. 
+&lt;img alt="container-vm" src="https://en.yangtalks.com/2017/container-vm.png"&gt;&lt;/p&gt;
+&lt;p&gt;They are very like house and apartment. For a house you'll need to build your own heat system, plumbing, electricity and network but for an apartment they are all shared. Furthermore, in majority of cases houses are all going to have at least a bedroom, a living area and a kitchen. It’s incredibly difficult to find a ‘studio house’ So back to vm, you liked it or not, you will have to install your guest operating system and set up and configure softwares for every one of them. On the other hand, Docker just did these for you and you, the user, just focus on your idea.&lt;/p&gt;
+&lt;h3&gt;Image, Container and Repository&lt;/h3&gt;
+&lt;p&gt;There are three important concept in Dockers: image, container and repository. Image is your application and it’s dependencies, from operating system to the end program. Image is like Lego brick, while you’re building something from scratch, you’ll need at least to have a base, an OS images, it’s where your app will be on, most famous OS have started support Docker such as Ubuntu, CentOS, Mint, Alpine and … Windows! &lt;/p&gt;
+&lt;p&gt;Next, with your base, you start to create your astonishing architecture upon it with a Dockerfile. In a Dockerfile you define how it will be built and in the end you’ll get a list of steps that to build your image. With these steps in the Dockerfile, Docker build the image for you. Once the building is finished, it will be transferred to your own repository.&lt;/p&gt;
+&lt;p&gt;&lt;img alt="dockers" src="https://en.yangtalks.com/2017/dockers.png"&gt;&lt;/p&gt;
+&lt;p&gt;And at this point, your app is actually ready to run at anywhere of the world. Whenever you decide wherever of the world you are likely to launch your app, Docker will take out your image from repository, fill them into a container and it will run at where you’ve asked for.&lt;/p&gt;
+&lt;h2&gt;How it helps&lt;/h2&gt;
+&lt;p&gt;The Docker company has published the largest image platform ‘DockerHub’. Everyone can share their images or Dockerfile there. Almost all of the famous softwares have pushed their own official images there. Developer can explore or start to use any technology they are interested without caring too much about the details.&lt;/p&gt;
+&lt;p&gt;Have you noticed that we have gradually illustrated how Docker would help QA? The places that your want the app to run, in the reality, are those different testing environments! One image, run any environments! Because apart from the configurations, they are all the same! We’ll never need those many machines standby for QA and we’ll never heard developers complaining about ‘working on my machine’.&lt;/p&gt;
+&lt;p&gt;As part of Docker toolset, ‘docker-compose’ allows us using one file to define what and how many containers would you like to run, how would you like to build network between them. Based on this concept, you’ll have the ability to define your infrastructure in a structured way, also a stable way. Because we know the container already has all our app needs and it will always be running consistently.&lt;/p&gt;
+&lt;h2&gt;Dockerspace&lt;/h2&gt;
+&lt;p&gt;&lt;a href="https://zentby.github.io/dockerspace/"&gt;Dockerspace&lt;/a&gt; is an side project that focus on helping developers in Unleashed can easily get their development environments setup without much effort.&lt;/p&gt;
+&lt;p&gt;&lt;a href="https://github.com/zentby/dockerspace"&gt;Go get your copy now and get dockerized today.&lt;/a&gt;&lt;/p&gt;</content><category term="Blog"></category><category term="docker"></category></entry><entry><title>Golang and Unleashed</title><link href="https://en.yangtalks.com/2016/golang-and-unleashed.html" rel="alternate"></link><published>2016-09-29T21:14:00+13:00</published><updated>2016-09-29T21:14:00+13:00</updated><author><name>Yang Zhao</name></author><id>tag:en.yangtalks.com,2016-09-29:/2016/golang-and-unleashed.html</id><summary type="html">&lt;p&gt;Recently I opened a new project called "&lt;a href="https://github.com/zentby/go-unleashed"&gt;go-unleashed&lt;/a&gt;". It's an Unleashed API client written in golang. As my first go project it is deeply inspired by &lt;a href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt;. You would feel they are really familiar as I'm trying to learn test …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Recently I opened a new project called "&lt;a href="https://github.com/zentby/go-unleashed"&gt;go-unleashed&lt;/a&gt;". It's an Unleashed API client written in golang. As my first go project it is deeply inspired by &lt;a href="https://github.com/google/go-github"&gt;go-github&lt;/a&gt;. You would feel they are really familiar as I'm trying to learn test driven golang development by the two projects.&lt;/p&gt;
+&lt;p&gt;"go-unleashed" is already finished for development. Though there still some endpoints are missing but I'm not gonna add them for now. Feel free to create an issue or create a pull request or fork for your own and change on your own needs.&lt;/p&gt;</content><category term="Go"></category><category term="code"></category><category term="golang"></category></entry></feed>
